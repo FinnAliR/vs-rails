@@ -3,14 +3,15 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
 
-namespace vs
+namespace VSRails
 {
     public class VSRails : ModSystem
     {
-        // Called on server and client
+        public string ModId => Mod.Info.ModID;
+        public ILogger Logger => Mod.Logger;
         public override void Start(ICoreAPI api)
         {
-            Mod.Logger.Notification("Hello from template mod: " + Lang.Get("mymodid:hello"));
+            Mod.Logger.Notification("Hello from template mod: " + Lang.Get("game:hello"));
         }
 
         public override void StartServerSide(ICoreServerAPI api)

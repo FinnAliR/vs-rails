@@ -1,0 +1,13 @@
+{
+    "type": "code",
+    "modid": "vsrails",
+    "name": "VS Rails",
+    "authors": [
+        "FinnAliR"
+    ],
+    "description": "Adds rails and minecarts to your vintage world!",
+    "version": "0.0.1",
+    "dependencies": {
+        "game": ""
+    }
+}

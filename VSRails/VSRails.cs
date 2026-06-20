@@ -3,9 +3,9 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
 
-namespace ModTemplate
+namespace vs
 {
-    public class ModTemplateModSystem : ModSystem
+    public class VSRails : ModSystem
     {
         // Called on server and client
         public override void Start(ICoreAPI api)

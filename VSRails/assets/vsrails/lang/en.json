@@ -1,4 +1,6 @@
 {
     "block-rail-straight": "Straight Rail",
-    "block-rail-straight-filler": "Straight Rail"
+    "block-rail-straight-filler": "Straight Rail",
+    "entity-cart-handcar": "Handcar",
+    "entity-cart-jonas": "Jonas Cart"
 }

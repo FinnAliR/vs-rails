@@ -13,7 +13,7 @@ namespace VSRails
         {
             api.RegisterBlockClass("BlockRail", typeof(BlockRail));
             api.RegisterBlockClass("BlockRailFiller", typeof(BlockRailFiller));
-            api.RegisterBlockEntityClass("BlockEntityRail", typeof(BlockEntityRail));
+            api.RegisterEntity("cart-jonas", typeof(EntityJonasCart));
         }
 
         public override void StartServerSide(ICoreServerAPI api)

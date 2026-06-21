@@ -1,77 +1,27 @@
 {
-  "code": "hand-car",
+  "code": "cart-handcar",
   "class": "EntityAgent",
-  "tags": ["mechanical", "habitat-land"],
-  "inheritFrom": "entities/hand-car",
-  "attributes": {
-    "handbook": {
-      "groupcode": "creaturegroup-tamedwildhorse-{type}"
-    }
-  },
+  "hitboxSize": { "x": 0.45, "y": 0.5 },
+  "deadHitboxSize": { "x": 0.45, "y": 0.25 },
   "drops": [],
-  "behaviorConfigs": {
-    "rideableaccessories": {
-      "enabledByType": {
-        "*adult*": true,
-        "*": false
-      },
-      "wearableSlots": [
-        { "code": "middlebackunder-{type}", "forCategoryCodes": ["blanket", "tackblanket"], "attachmentPointCode": "MidUnderAP", "stepParentTo": { "": { "elementName": "MidUnderStorage" } } },
-        { "code": "neck-{type}", "forCategoryCodes": ["lantern"], "attachmentPointCode": "NeckAP", "stepParentTo": { "": { "elementName": "NeckStorage" } } }
-      ]},
-    "selectionboxes": {
-      "enabledByType": {"*adult*": true,"*": false},
-      "selectionBoxes": [ "HeadAP", "MidAP", "MidUnderAP", "RearSideAP", "NeckAP", "RearAP", "FaceAP", "RidingAP" ]
-    },
-    "jaunt:rideable": {
-      "enabledByType": {
-        "*adult*": true,
-        "*": false
-      },
-      "saddleBreaksRequired": { "avg": 0, "var": 0 }
-    },
-    "ownable": {
-      "enabledByType": {
-        "*adult*": true,
-        "*": false
-      },
-      "groupCode": "ferus"
-    }
-  },
   "client": {
+    "renderer": "Shape",
+    "shape": { "base": "game:block/clutter/mech-helper" },
+    "textures": {
+      "quartzglass": { "base": "game:block/glass/quartzglass" },
+      "rustyglow":   { "base": "game:block/machine/statictranslocator/rustyglow" },
+      "rusty-iron":  { "base": "game:block/metal/tarnished/rusty-iron" },
+      "steel":       { "base": "game:block/metal/tarnished/steel" },
+      "charred":     { "base": "game:block/wood/charred" }
+    },
     "behaviors": [
-      { "code": "repulseagents" },
-      { "code": "controlledphysics"},
-      { "code": "floatupwhenstuck"},
       { "code": "interpolateposition" },
-      { "code": "health" },
-      { "code": "harvestable"},
-      { "code": "genelib.multiply"},
-      { "code": "rideableaccessories"},
-      { "code": "jaunt:rideable"},
-      { "code": "selectionboxes"},
-      { "code": "jaunt:stamina" },
-      { "code": "jaunt:gait" },
-      { "code": "ropetieable" }
+      { "code": "controlledphysics" }
     ]
   },
   "server": {
     "behaviors": [
-      { "code": "repulseagents" },
-      { "code": "controlledphysics" },
-      { "code": "health" },
-      { "code": "deaddecay" },
-      { "code": "floatupwhenstuck" },
-      { "code": "harvestable" },
-      { "code": "emotionstates" },
-      { "code": "taskai" },
-      { "code": "pettable" },
-      { "code": "selectionboxes" },
-      { "code": "rideableaccessories" },
-      { "code": "jaunt:gait" },
-      { "code": "jaunt:rideable" },
-      { "code": "jaunt:stamina" },
-      { "code": "ropetieable" },
-      { "code": "entitystatetags" }
+      { "code": "controlledphysics" }
     ]
-  }}
+  }
+}

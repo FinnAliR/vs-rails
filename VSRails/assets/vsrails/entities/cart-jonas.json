@@ -1,0 +1,31 @@
+{
+  "code": "cart-jonas",
+  "class": "EntityJonasCart",
+  "hitboxSize": { "x": 1.0, "y": 1.0 },
+  "deadHitboxSize": { "x": 1.0, "y": 0.5 },
+  "drops": [],
+
+  "client": {
+    "renderer": "Shape",
+    "shape": { "base": "survival:block/clutter/mech-helper" },
+    "textures": {
+      "quartzglass": { "base": "game:block/glass/quartzglass" },
+      "rustyglow":   { "base": "game:block/machine/statictranslocator/rustyglow" },
+      "rusty-iron":  { "base": "game:block/metal/tarnished/rusty-iron" },
+      "steel":       { "base": "game:block/metal/tarnished/steel" },
+      "charred":     { "base": "game:block/wood/charred" }
+    },
+    "behaviors": [
+      { "code": "interpolateposition" }
+    ]
+  },
+
+  "server": {
+    "behaviors": [
+      {
+        "code": "controlledphysics",
+        "stepHeight": 0.2
+      }
+    ]
+  }
+}

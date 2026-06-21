@@ -1,17 +1,14 @@
 ﻿{
   "code": "rail-straight-filler",
   "class": "BlockRailFiller",
-  "entityClass": "BlockEntityRailFiller",
   "behaviors": [],
   "creativeinventory": {},
+  "drawtype": "Empty",
   "sidesolid": { "all": false },
   "sideopaque": { "all": false },
   "replaceable": 9500,
   "resistance": 1.5,
   "blockmaterial": "Wood",
-
-  "renderpass": "Transparent",
-  "shape": { "base": "block/basic/air" },
 
   "collisionbox": {
     "x1": 0, "y1": 0, "z1": 0,

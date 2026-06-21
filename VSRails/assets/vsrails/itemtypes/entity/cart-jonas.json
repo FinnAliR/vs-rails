@@ -1,0 +1,8 @@
+﻿{
+  "code": "cart-jonas",
+  "class": "ItemCreature",
+  "creativeinventory": {
+    "general": ["*"]
+  },
+  "entityCode": "vsrails:cart-jonas"
+}

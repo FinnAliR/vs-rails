@@ -13,17 +13,15 @@ namespace VSRails
         {
             api.RegisterBlockClass("BlockRail", typeof(BlockRail));
             api.RegisterBlockClass("BlockRailFiller", typeof(BlockRailFiller));
-            api.RegisterEntity("cart-jonas", typeof(EntityJonasCart));
+            api.RegisterEntity("JonasCart", typeof(JonasCart));
         }
 
         public override void StartServerSide(ICoreServerAPI api)
         {
-            Mod.Logger.Notification("Hello from template mod server side");
         }
 
         public override void StartClientSide(ICoreClientAPI api)
         {
-            Mod.Logger.Notification("Hello from template mod client side");
         }
     }
 }

@@ -11,18 +11,18 @@ namespace VSRails;
 /// snaps to the rail axis, and self-propels when a player is riding.
 /// Right-click to mount; travel direction is set from the player's look.
 /// </summary>
-public class EntityJonasCart : EntityAgent, IMountable
+public class JonasCart : EntityAgent, IMountable
 {
     // ── IMountable ────────────────────────────────────────────────────────────
     private IMountableSeat[] _seats;
 
     public IMountableSeat[]  Seats               => _seats;
-    public Vintagestory.API.Common.Entities.Entity            MountableEntity      => this;
-    public Vintagestory.API.Common.Entities.Entity            OnEntity             => this;
+    public Entity            MountableEntity      => this;
+    public Entity            OnEntity             => this;
     public EntityPos         Position             => Pos;
     public double            StepPitch            => 0;
     public bool              AnyMounted()         => _seats[0].Passenger != null;
-    public Vintagestory.API.Common.Entities.Entity Controller => _seats[0].Passenger;
+    public Entity Controller => _seats[0].Passenger;
     public EntityControls    ControllingControls  => (_seats[0].Passenger as EntityAgent)?.Controls;
 
     // ── Rail state ────────────────────────────────────────────────────────────
@@ -137,18 +137,18 @@ public class EntityJonasCart : EntityAgent, IMountable
     // ── Seat ─────────────────────────────────────────────────────────────────
     private sealed class CartSeat : IMountableSeat
     {
-        private readonly EntityJonasCart _cart;
+        private readonly JonasCart _cart;
         private readonly Matrixf         _identity = new Matrixf();
         private readonly EntityPos       _seatPos  = new EntityPos();
 
-        public CartSeat(EntityJonasCart cart) => _cart = cart;
+        public CartSeat(JonasCart cart) => _cart = cart;
 
         public IMountable         MountSupplier          => _cart;
-        public Vintagestory.API.Common.Entities.Entity             Entity                 => _cart;
+        public Entity             Entity                 => _cart;
         public string             SeatId                 { get; set; } = "main";
         public SeatConfig         Config                 { get; set; }
 
-        public Vintagestory.API.Common.Entities.Entity             Passenger              { get; set; }
+        public Entity             Passenger              { get; set; }
         public long               PassengerEntityIdForInit { get; set; }
 
         public EntityPos SeatPosition

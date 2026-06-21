@@ -6,7 +6,7 @@
   "drops": [],
   "client": {
     "renderer": "Shape",
-    "shape": { "base": "game:block/clutter/mech-helper" },
+    "shape": { "base": "game:entity/humanoid/player" },
     "textures": {
       "quartzglass": { "base": "game:block/glass/quartzglass" },
       "rustyglow":   { "base": "game:block/machine/statictranslocator/rustyglow" },

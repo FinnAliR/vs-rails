@@ -1,28 +1,28 @@
 {
-  "code": "rail",
+  "code": "rails",
   "class": "BlockRail",
   "behaviors": [ { "name": "Unstable" } ],
   "attributes": {
     "handbook": {
-      "groupBy": ["rail-*"],
-      "exclude": true
+      "groupBy": ["rail"]
     }
   },
   "variantgroups": [
-    { "code": "type", "states": ["se", "sw", "nw", "ne", "ns", "ew"] }
+    { "code": "type", "states": ["curved_es", "curved_sw", "curved_wn", "curved_ne", "flat_ns", "flat_we", "raised_ns", "raised_we"] }
   ],
   "creativeinventory": { "general": ["rail-ns"] },
   "shapeByType": {
-    "*-sw": { "base": "vsrails:block/rail/rail-curve", "rotateY": 270 },
-    "*-nw": { "base": "vsrails:block/rail/rail-curve", "rotateY": 180 },
-    "*-ne": { "base": "vsrails:block/rail/rail-curve", "rotateY": 90 },
-    "*-ew": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
+    "*-curved_sw": { "base": "vsrails:block/rail/rail-curve", "rotateY": 270 },
+    "*-curved_wn": { "base": "vsrails:block/rail/rail-curve", "rotateY": 180 },
+    "*-curved_ne": { "base": "vsrails:block/rail/rail-curve", "rotateY": 90 },
+    "*-flat_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
+    "*-raised_we":  { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
     "*":    { "base": "vsrails:block/rail/rail-flat" }
   },
   "blockmaterial": "Metal",
   "textures": {
-    "rail": { "base": "vsrails:block/rail/railtrackiron" },
-    "tie":  { "base": "vsrails:block/rail/railtrackoak" }
+    "metal": { "base": "game:block/metal/corroded/normal1"},
+    "wood": { "base": "game:block/wood/debarked/veryaged"}
   },
   "sidesolid": {
     "all": false
@@ -35,10 +35,10 @@
   "collisionbox": null,
   "selectionbox": { "x1": 0, "y1": 0, "z1": 0, "x2": 1, "y2": 0.125, "z2": 1 },
   "sounds": {
-    "place": "block/planks",
-    "hit": "block/planks",
-    "break": "block/planks",
-    "walk": "walk/wood"
+    "place": "game:block/planks",
+    "hit": "game:block/planks",
+    "break": "game:block/planks",
+    "walk": "game:walk/wood"
   },
   "guiTransform": {
     "translation": { "x": 0, "y": 2, "z": 0 },

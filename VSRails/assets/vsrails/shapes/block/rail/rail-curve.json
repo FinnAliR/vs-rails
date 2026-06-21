@@ -1,12 +1,13 @@
-﻿{
+{
   "editor": {
+    "allAngles": true,
     "entityTextureMode": true,
     "backdrops": [],
     "attachments": []
   },
   "textures": {
-    "metal": { "base": "game:block/metal/corroded/normal1"},
-    "wood": { "base": "game:block/wood/debarked/veryaged"}
+    "metal": "block\\metal\\corroded\\normal1",
+    "wood": "block\\wood\\debarked\\veryaged"
   },
   "elements": [
     {

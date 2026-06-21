@@ -19,7 +19,7 @@
     "*-ew": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
     "*":    { "base": "vsrails:block/rail/rail-flat" }
   },
-  "blockmaterial": "Wood",
+  "blockmaterial": "Metal",
   "textures": {
     "rail": { "base": "vsrails:block/rail/railtrackiron" },
     "tie":  { "base": "vsrails:block/rail/railtrackoak" }

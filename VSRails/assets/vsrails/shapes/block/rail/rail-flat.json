@@ -6,8 +6,8 @@
     "attachments": []
   },
   "textures": {
-    "metal": "block\\metal\\corroded\\normal1",
-    "wood": "block\\wood\\debarked\\veryaged"
+    "metal": { "base": "game:block/metal/corroded/normal1"},
+    "wood": { "base": "game:block/wood/debarked/veryaged"}
   },
   "elements": [
     {

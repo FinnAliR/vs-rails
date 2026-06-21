@@ -6,8 +6,8 @@
     "attachments": []
   },
   "textures": {
-    "metal": "block\\metal\\corroded\\normal1",
-    "wood": "block\\wood\\debarked\\veryaged"
+    "metal": "#metal",
+    "wood": "#wood"
   },
   "elements": [
     {

@@ -1,23 +1,47 @@
 {
   "code": "rails",
   "class": "BlockRail",
-  "behaviors": [ { "name": "Unstable" } ],
+  "behaviors": [{ "name": "Unstable" }],
+
   "attributes": {
     "handbook": {
       "groupBy": ["rail"]
     }
   },
+
   "variantgroups": [
-    { "code": "type", "states": ["curved_es", "curved_sw", "curved_wn", "curved_ne", "flat_ns", "flat_we", "raised_ns", "raised_we"] }
+    {
+      "code": "type",
+      "states": [
+        "curved_es",
+        "curved_sw",
+        "curved_wn",
+        "curved_ne",
+        "flat_ns",
+        "flat_we",
+        "raised_ns",
+        "raised_we"
+      ]
+    }
   ],
-  "creativeinventory": { "general": ["rail-ns"] },
+
+  "creativeinventory": {
+    "general": ["flat_ns"]
+  },
+
   "shapeByType": {
-    "*-curved_sw": { "base": "vsrails:block/rail/rail-curve", "rotateY": 270 },
-    "*-curved_wn": { "base": "vsrails:block/rail/rail-curve", "rotateY": 180 },
-    "*-curved_ne": { "base": "vsrails:block/rail/rail-curve", "rotateY": 90 },
-    "*-flat_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
-    "*-raised_we":  { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
-    "*":    { "base": "vsrails:block/rail/rail-flat" }
+    "curved_es": { "base": "vsrails:block/rail/rail-curve", "rotateY": 0 },
+    "curved_sw": { "base": "vsrails:block/rail/rail-curve", "rotateY": 270 },
+    "curved_wn": { "base": "vsrails:block/rail/rail-curve", "rotateY": 180 },
+    "curved_ne": { "base": "vsrails:block/rail/rail-curve", "rotateY": 90 },
+
+    "flat_ns": { "base": "vsrails:block/rail/rail-flat", "rotateY": 0 },
+    "flat_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
+
+    "raised_ns": { "base": "vsrails:block/rail/rail-flat", "rotateY": 0 },
+    "raised_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
+
+    "*": { "base": "vsrails:block/rail/rail-flat" }
   },
   "blockmaterial": "Metal",
   "textures": {

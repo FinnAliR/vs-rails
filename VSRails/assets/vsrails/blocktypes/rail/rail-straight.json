@@ -1,0 +1,48 @@
+﻿{
+  "code": "rail-straight",
+  "class": "BlockRail",
+  "entityClass": "BlockEntityRail",
+  "behaviors": [],
+  "attributes": {
+    "fillerBlockCode": "rail-straight-filler"
+  },
+  "creativeinventory": { "general": ["*"], "vsrails": ["*"] },
+  "sounds": {
+    "place": "block/planks",
+    "hit": "block/planks",
+    "break": "block/planks"
+  },
+  "sidesolid": {
+    "all": false
+  },
+  "sideopaque": {
+    "all": false
+  },
+  "replaceable": 500,
+  "resistance": 1.5,
+  "blockmaterial": "Wood",
+
+  "shape": { "base": "vsrails:block/rail/rail-straight" },
+
+  "textures": {
+    "rail": { "base": "vsrails:block/rail/rail-straight" },
+    "tie": { "base": "vsrails:block/rail/rail-tie" }
+  },
+
+  "collisionbox": {
+    "x1": 0, "y1": 0, "z1": 0,
+    "x2": 1, "y2": 0.25, "z2": 1
+  },
+  "selectionbox": {
+    "x1": 0, "y1": 0, "z1": 0,
+    "x2": 1, "y2": 0.25, "z2": 1
+  },
+
+  "drops": [
+    { "type": "block", "code": "rail-straight" }
+  ],
+
+  "combustibleProps": { "burnTemperature": 600, "burnDuration": 30 },
+
+  "materialDensity": 600
+}

@@ -1,0 +1,1219 @@
+{
+	"editor": {
+		"backdrops": [],
+		"attachments": []
+	},
+	"textures": {
+		"wood": "block/wood/debarked/oak"
+	},
+	"elements": [
+		{
+			"name": "Sleeper",
+			"from":[-8.0,0.0,-5.0],
+			"to":[24.0,1.0,-1.0],
+			"faces": {
+				"north": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,32.0,1.0]
+				},
+				"east": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,4.0,1.0]
+				},
+				"south": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,32.0,1.0]
+				},
+				"west": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,4.0,1.0]
+				},
+				"up": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,32.0,4.0]
+				},
+				"down": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,32.0,4.0]
+				}
+			},
+			"rotationOrigin":[-8.0,0.0,-5.0],
+			"scaleX": 1.0,
+			"scaleY": 1.0,
+			"scaleZ": 1.0,
+			"children": [
+				{
+					"name": "Sleeper (2)",
+					"from":[0.0,0.0,11.0],
+					"to":[32.0,1.0,15.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,4.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,4.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,4.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,4.0]
+						}
+					},
+					"rotationOrigin":[0.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Sleeper (3)",
+					"from":[0.0,0.0,22.0],
+					"to":[32.0,1.0,26.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,4.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,4.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,4.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,4.0]
+						}
+					},
+					"rotationOrigin":[0.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				}
+			],
+			"uv":[0.0,0.0]
+		},
+		{
+			"name": "Rail",
+			"from":[-4.0,0.5,-8.0],
+			"to":[-2.0,1.5,24.0],
+			"faces": {
+				"north": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,1.0]
+				},
+				"east": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,32.0,1.0]
+				},
+				"south": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,1.0]
+				},
+				"west": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,32.0,1.0]
+				},
+				"up": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,32.0]
+				},
+				"down": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,32.0]
+				}
+			},
+			"rotationOrigin":[-4.0,0.5,-8.0],
+			"scaleX": 1.0,
+			"scaleY": 1.0,
+			"scaleZ": 1.0,
+			"children": [
+				{
+					"name": "Rail (2)",
+					"from":[0.0,2.0,0.0],
+					"to":[2.0,3.0,32.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,32.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,32.0]
+						}
+					},
+					"rotationOrigin":[0.0,2.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Rail (3)",
+					"from":[22.0,0.0,0.0],
+					"to":[24.0,1.0,32.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,32.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,32.0]
+						}
+					},
+					"rotationOrigin":[22.0,0.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Rail (4)",
+					"from":[22.0,2.0,0.0],
+					"to":[24.0,3.0,32.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,32.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,32.0]
+						}
+					},
+					"rotationOrigin":[22.0,2.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Rail Centre",
+					"from":[0.5,1.0,0.0],
+					"to":[1.5,2.0,32.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,32.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,32.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,32.0]
+						}
+					},
+					"rotationOrigin":[0.5,1.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"children": [
+						{
+							"name": "Rail Centre (2)",
+							"from":[22.0,0.0,0.0],
+							"to":[23.0,1.0,32.0],
+							"faces": {
+								"north": {
+									"texture": "#wood",
+									"uv":[0.0,0.0,1.0,1.0]
+								},
+								"east": {
+									"texture": "#wood",
+									"uv":[0.0,0.0,32.0,1.0]
+								},
+								"south": {
+									"texture": "#wood",
+									"uv":[0.0,0.0,1.0,1.0]
+								},
+								"west": {
+									"texture": "#wood",
+									"uv":[0.0,0.0,32.0,1.0]
+								},
+								"up": {
+									"texture": "#wood",
+									"uv":[0.0,0.0,1.0,32.0]
+								},
+								"down": {
+									"texture": "#wood",
+									"uv":[0.0,0.0,1.0,32.0]
+								}
+							},
+							"rotationOrigin":[22.0,0.0,0.0],
+							"scaleX": 1.0,
+							"scaleY": 1.0,
+							"scaleZ": 1.0,
+							"uv":[0.0,0.0]
+						}
+					],
+					"uv":[0.0,0.0]
+				}
+			],
+			"uv":[0.0,0.0]
+		},
+		{
+			"name": "Fastner",
+			"from":[16.5,0.5,-4.0],
+			"to":[18.5,1.5,-2.0],
+			"faces": {
+				"north": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,1.0]
+				},
+				"east": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,1.0]
+				},
+				"south": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,1.0]
+				},
+				"west": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,1.0]
+				},
+				"up": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,2.0]
+				},
+				"down": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,2.0,2.0]
+				}
+			},
+			"rotationOrigin":[16.5,0.5,-4.0],
+			"scaleX": 1.0,
+			"scaleY": 1.0,
+			"scaleZ": 1.0,
+			"children": [
+				{
+					"name": "Fastner (2)",
+					"from":[3.0,0.0,0.0],
+					"to":[5.0,1.0,2.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[3.0,0.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (3)",
+					"from":[3.0,0.0,11.0],
+					"to":[5.0,1.0,13.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[3.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (4)",
+					"from":[0.0,0.0,11.0],
+					"to":[2.0,1.0,13.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[0.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (5)",
+					"from":[0.0,0.0,22.0],
+					"to":[2.0,1.0,24.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[0.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (6)",
+					"from":[3.0,0.0,22.0],
+					"to":[5.0,1.0,24.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[3.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (7)",
+					"from":[-19.0,0.0,22.0],
+					"to":[-17.0,1.0,24.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[-19.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (8)",
+					"from":[-22.0,0.0,22.0],
+					"to":[-20.0,1.0,24.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[-22.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (9)",
+					"from":[-22.0,0.0,11.0],
+					"to":[-20.0,1.0,13.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[-22.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (10)",
+					"from":[-19.0,0.0,11.0],
+					"to":[-17.0,1.0,13.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[-19.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (11)",
+					"from":[-19.0,0.0,0.0],
+					"to":[-17.0,1.0,2.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[-19.0,0.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner (12)",
+					"from":[-22.0,0.0,0.0],
+					"to":[-20.0,1.0,2.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,2.0,2.0]
+						}
+					},
+					"rotationOrigin":[-22.0,0.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"children": [],
+					"uv":[0.0,0.0]
+				}
+			],
+			"uv":[0.0,0.0]
+		},
+		{
+			"name": "Fastner Spike",
+			"from":[-5.0,1.0,-3.5],
+			"to":[-4.0,2.0,-2.5],
+			"faces": {
+				"north": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,1.0,1.0]
+				},
+				"east": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,1.0,1.0]
+				},
+				"south": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,1.0,1.0]
+				},
+				"west": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,1.0,1.0]
+				},
+				"up": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,1.0,1.0]
+				},
+				"down": {
+					"texture": "#wood",
+					"uv":[0.0,0.0,1.0,1.0]
+				}
+			},
+			"rotationOrigin":[-5.0,1.0,-3.5],
+			"scaleX": 1.0,
+			"scaleY": 1.0,
+			"scaleZ": 1.0,
+			"children": [
+				{
+					"name": "Fastner Spike (2)",
+					"from":[0.0,0.0,11.0],
+					"to":[1.0,1.0,12.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[0.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (3)",
+					"from":[0.0,0.0,22.0],
+					"to":[1.0,1.0,23.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[0.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (4)",
+					"from":[3.0,0.0,22.0],
+					"to":[4.0,1.0,23.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[3.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (5)",
+					"from":[3.0,0.0,11.0],
+					"to":[4.0,1.0,12.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[3.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (6)",
+					"from":[3.0,0.0,0.0],
+					"to":[4.0,1.0,1.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[3.0,0.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (7)",
+					"from":[22.0,0.0,0.0],
+					"to":[23.0,1.0,1.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[22.0,0.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (8)",
+					"from":[22.0,0.0,11.0],
+					"to":[23.0,1.0,12.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[22.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (9)",
+					"from":[22.0,0.0,22.0],
+					"to":[23.0,1.0,23.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[22.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (10)",
+					"from":[25.0,0.0,22.0],
+					"to":[26.0,1.0,23.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[25.0,0.0,22.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (11)",
+					"from":[25.0,0.0,11.0],
+					"to":[26.0,1.0,12.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[25.0,0.0,11.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				},
+				{
+					"name": "Fastner Spike (12)",
+					"from":[25.0,0.0,0.0],
+					"to":[26.0,1.0,1.0],
+					"faces": {
+						"north": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"east": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"south": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"west": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"up": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						},
+						"down": {
+							"texture": "#wood",
+							"uv":[0.0,0.0,1.0,1.0]
+						}
+					},
+					"rotationOrigin":[25.0,0.0,0.0],
+					"scaleX": 1.0,
+					"scaleY": 1.0,
+					"scaleZ": 1.0,
+					"uv":[0.0,0.0]
+				}
+			],
+			"uv":[0.0,0.0]
+		}
+	],
+	"animations": [],
+	"textureWidth": 16,
+	"textureHeight": 16,
+	"textureSizes": {
+		"wood": [
+			16,
+			16
+		]
+	}
+}

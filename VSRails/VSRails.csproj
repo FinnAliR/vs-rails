@@ -39,8 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="assets\vsrails\blocktypes\" />
-    <Folder Include="src\" />
+    <Folder Include="assets\vsrails\textures\block\rail\" />
   </ItemGroup>
 
 </Project>

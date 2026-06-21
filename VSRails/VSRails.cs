@@ -11,7 +11,9 @@ namespace VSRails
         public ILogger Logger => Mod.Logger;
         public override void Start(ICoreAPI api)
         {
-            Mod.Logger.Notification("Hello from template mod: " + Lang.Get("game:hello"));
+            api.RegisterBlockClass("BlockRail", typeof(BlockRail));
+            api.RegisterBlockClass("BlockRailFiller", typeof(BlockRailFiller));
+            api.RegisterBlockEntityClass("BlockEntityRail", typeof(BlockEntityRail));
         }
 
         public override void StartServerSide(ICoreServerAPI api)

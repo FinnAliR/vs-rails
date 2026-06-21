@@ -6,7 +6,7 @@
   "drawtype": "Empty",
   "sidesolid": { "all": false },
   "sideopaque": { "all": false },
-  "replaceable": 9500,
+  "replaceable": 0,
   "resistance": 1.5,
   "blockmaterial": "Wood",
 

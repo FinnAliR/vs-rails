@@ -38,8 +38,4 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="assets\vsrails\textures\block\rail\" />
-  </ItemGroup>
-
 </Project>

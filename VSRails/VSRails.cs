@@ -2,6 +2,7 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
+using Vintagestory.GameContent;
 
 namespace VSRails
 {
@@ -12,7 +13,7 @@ namespace VSRails
         public override void Start(ICoreAPI api)
         {
             api.RegisterBlockClass("BlockRail", typeof(BlockRail));
-            api.RegisterBlockClass("BlockRailFiller", typeof(BlockRailFiller));
+            api.RegisterBlockClass("BlockRail", typeof(BlockRail));w
             api.RegisterEntity("JonasCart", typeof(JonasCart));
         }
 

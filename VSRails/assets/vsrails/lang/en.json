@@ -1,6 +1,7 @@
 {
     "block-rail-straight": "Straight Rail",
     "block-rail-straight-filler": "Straight Rail",
+    "block-rail-curve": "Curved Rail",
     "entity-cart-handcar": "Handcar",
     "entity-cart-jonas": "Jonas Cart"
 }

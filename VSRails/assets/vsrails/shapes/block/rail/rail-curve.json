@@ -1,0 +1,442 @@
+﻿{
+  "editor": {
+    "entityTextureMode": true,
+    "backdrops": [],
+    "attachments": []
+  },
+  "textures": {
+    "metal": { "base": "game:block/metal/corroded/normal1"},
+    "wood": { "base": "game:block/wood/debarked/veryaged"}
+  },
+  "elements": [
+    {
+      "name": "Rail1-1",
+      "from":[-0.11876725382171571,0.99,6.6966621529310935],
+      "to":[1.8812327461782843,2.49,11.696662152931093],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,5.0,1.5]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,5.0,1.5]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,5.0]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,5.0]
+        }
+      },
+      "rotationOrigin":[0.88123274617828429,1.0,16.996662152931094],
+      "rotationY": -22.5,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Rail2-1",
+      "from":[11.853496322408319,0.99,14.37835303246975],
+      "to":[13.853496322408319,2.49,16.678352984786034],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,2.0]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,2.0]
+        }
+      },
+      "rotationOrigin":[13.853496322408319,2.0,16.578353032469749],
+      "rotationY": -22.5,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Base1",
+      "from":[-1.0,0.0,16.0],
+      "to":[15.0,1.0,18.0],
+      "faces": {
+        "north": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,16.0,1.0]
+        },
+        "east": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,1.0]
+        },
+        "south": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,16.0,1.0]
+        },
+        "west": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,1.0]
+        },
+        "up": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,16.0,2.0]
+        },
+        "down": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,16.0,2.0]
+        }
+      },
+      "rotationOrigin":[16.0,1.0,17.0],
+      "rotationY": -22.5,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Base3",
+      "from":[16.0,0.0,-1.0],
+      "to":[18.0,1.0,15.0],
+      "faces": {
+        "north": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,1.0]
+        },
+        "east": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,16.0,1.0]
+        },
+        "south": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,1.0]
+        },
+        "west": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,16.0,1.0]
+        },
+        "up": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,16.0]
+        },
+        "down": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,16.0]
+        }
+      },
+      "rotationOrigin":[17.0,1.0,16.0],
+      "rotationY": 22.5,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Base2",
+      "from":[15.19795735180378,0.01,-1.197957381606102],
+      "to":[17.19795735180378,1.01,14.802042618393898],
+      "faces": {
+        "north": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,1.0]
+        },
+        "east": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,16.0,1.0]
+        },
+        "south": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,1.0]
+        },
+        "west": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,16.0,1.0]
+        },
+        "up": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,16.0]
+        },
+        "down": {
+          "texture": "#wood",
+          "uv":[0.0,0.0,2.0,16.0]
+        }
+      },
+      "rotationOrigin":[17.19795735180378,1.0,15.802042618393898],
+      "rotationY": 45.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Rail1-2",
+      "from":[11.75,1.0,2.0],
+      "to":[16.0,2.5,4.0],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,4.0,1.5]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,4.0,1.5]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,4.0,2.0]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,4.0,2.0]
+        }
+      },
+      "rotationOrigin":[23.438390376628377,1.99,3.000427546678111],
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Rail2-2",
+      "from":[13.649012289941311,1.01,11.731170305982232],
+      "to":[16.149012289941311,2.51,13.731170305982232],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.5,1.5]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.5,1.5]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.5,2.0]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.5,2.0]
+        }
+      },
+      "rotationOrigin":[16.649012289941311,2.0,12.231170305982232],
+      "rotationY": 22.5,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Rail1-2 (2)",
+      "from":[6.6200281968340278,1.01,-0.55957815982401371],
+      "to":[11.620028196834028,2.51,1.4404218401759863],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,5.0,1.5]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,5.0,1.5]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,5.0,2.0]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,5.0,2.0]
+        }
+      },
+      "rotationOrigin":[18.120028196834028,2.0,0.44042184017598629],
+      "rotationY": 22.5,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Rail1-1 (3)",
+      "from":[-0.46973706781864166,0.99,1.6071862995624535],
+      "to":[1.5302629321813583,2.49,6.1071862995624535],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,4.5,1.5]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,4.5,1.5]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,4.5]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,4.5]
+        }
+      },
+      "rotationOrigin":[0.53026293218135834,1.0,11.907186299562454],
+      "rotationY": -45.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Rail2-2 (2)",
+      "from":[12.234606114099734,1.01,11.614683863590471],
+      "to":[13.734606114099734,2.51,13.614683863590471],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,1.5,1.5]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,1.5,1.5]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,1.5,2.0]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,1.5,2.0]
+        }
+      },
+      "rotationOrigin":[15.234606114099734,2.0,12.114683863590471],
+      "rotationY": 45.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    },
+    {
+      "name": "Rail1-1 (2) (2)",
+      "from":[2.0,1.0,11.75],
+      "to":[4.0,2.5,16.0],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,4.0,1.5]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,1.5]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,4.0,1.5]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,4.0]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv":[0.0,0.0,2.0,4.0]
+        }
+      },
+      "rotationOrigin":[3.0304427053779364,1.01,22.05],
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "scaleZ": 1.0,
+      "autoUnwrap": false,
+      "uv":[0.0,0.0]
+    }
+  ],
+  "animations": [],
+  "textureWidth": 16,
+  "textureHeight": 16,
+  "textureSizes": {
+    "metal": [
+      16,
+      16
+    ],
+    "wood": [
+      16,
+      16
+    ]
+  }
+}

@@ -1,9 +1,8 @@
 ﻿{
-  "code": "rail-flat",
+  "code": "rail-curve",
   "class": "BlockRail",
   "entityClass": "BlockEntityRail",
   "behaviors": [],
-
   "creativeinventory": { "general": ["*"], "vsrails": ["*"] },
   "sounds": {
     "place": "block/planks",
@@ -20,12 +19,8 @@
   "resistance": 1.5,
   "blockmaterial": "Wood",
 
-  "shape": { "base": "vsrails:block/rail/rail-flat" },
+  "shape": { "base": "vsrails:block/rail/rail-curve" },
 
-  "textures": {
-    "rail": { "base": "vsrails:block/rail/rail-straight" },
-    "tie": { "base": "vsrails:block/rail/rail-tie" }
-  },
 
   "collisionbox": {
     "x1": 0, "y1": 0, "z1": 0,
@@ -37,7 +32,7 @@
   },
 
   "drops": [
-    { "type": "block", "code": "rail-flat" }
+    { "type": "block", "code": "rail-straight" }
   ],
 
   "materialDensity": 600

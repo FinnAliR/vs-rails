@@ -39,6 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="src\BlockEntity\" />
     <Folder Include="src\Client\" />
   </ItemGroup>
 

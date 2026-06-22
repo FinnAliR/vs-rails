@@ -20,8 +20,10 @@
         "curved_ne",
         "flat_ns",
         "flat_we",
-        "raised_ns",
-        "raised_we"
+        "raised_n",
+        "raised_s",
+        "raised_e",
+        "raised_w"
       ]
     }
   ],
@@ -39,8 +41,10 @@
     "*-flat_ns": { "base": "vsrails:block/rail/rail-flat", "rotateY": 0 },
     "*-flat_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
 
-    "*-raised_ns": { "base": "vsrails:block/rail/rail-flat", "rotateY": 0 },
-    "*-raised_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
+    "*-raised_n": {"base": "vsrails:block/rail/rail-raised", "rotateY": 0},
+    "*-raised_e": {"base": "vsrails:block/rail/rail-raised", "rotateY": 270},
+    "*-raised_s": {"base": "vsrails:block/rail/rail-raised", "rotateY": 180},
+    "*-raised_w": {"base": "vsrails:block/rail/rail-raised", "rotateY": 90},
 
     "*": { "base": "vsrails:block/rail/rail-flat" }
   },

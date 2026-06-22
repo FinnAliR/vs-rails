@@ -22,6 +22,7 @@ namespace VSRails
             BlockFacing targetFacing = SuggestedHVOrientation(byPlayer, blockSel)[0];
             Block blockToPlace = null;
 
+            // 1. Same-plane neighbor attachment (existing curve logic) takes priority.
             for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
             {
                 BlockFacing facing = BlockFacing.HORIZONTALS[i];
@@ -31,6 +32,15 @@ namespace VSRails
                 }
             }
 
+            // 2. No same-plane neighbor found — check one block up/down in each horizontal
+            // direction for a rail to slope toward. Only ever reachable through placement,
+            // never held directly, same as curves.
+            if (TryAttachSlope(world, byPlayer, itemstack, blockSel.Position))
+            {
+                return true;
+            }
+
+            // 3. Fall back to a flat straight rail aligned to look direction.
             if (blockToPlace == null)
             {
                 if (targetFacing.Axis == EnumAxis.Z)
@@ -54,6 +64,45 @@ namespace VSRails
         }
 
         /// <summary>
+        /// Checks each horizontal direction for a rail one block up or one block down from
+        /// position. If found one block up in direction D, places a raised_D slope here (high
+        /// end faces D, toward the elevated neighbor). If found one block down in direction D,
+        /// places a raised_(opposite of D) slope here (this is the upper end, sloping down
+        /// toward D). Only fires when no same-plane neighbor was found.
+        /// </summary>
+        private bool TryAttachSlope(IWorldAccessor world, IPlayer byPlayer, ItemStack itemstack, BlockPos position)
+        {
+            for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
+            {
+                BlockFacing dir = BlockFacing.HORIZONTALS[i];
+
+                BlockPos upNeibPos = position.AddCopy(dir).Up();
+                if (world.BlockAccessor.GetBlock(upNeibPos) is BlockRail)
+                {
+                    Block slopeUp = world.GetBlock(CodeWithParts("raised_" + dir.Code[0]));
+                    if (slopeUp != null)
+                    {
+                        slopeUp.DoPlaceBlock(world, byPlayer, new BlockSelection { Position = position, Face = BlockFacing.UP }, itemstack);
+                        return true;
+                    }
+                }
+
+                BlockPos downNeibPos = position.AddCopy(dir).DownCopy();
+                if (world.BlockAccessor.GetBlock(downNeibPos) is BlockRail)
+                {
+                    Block slopeDown = world.GetBlock(CodeWithParts("raised_" + dir.Opposite.Code[0]));
+                    if (slopeDown != null)
+                    {
+                        slopeDown.DoPlaceBlock(world, byPlayer, new BlockSelection { Position = position, Face = BlockFacing.UP }, itemstack);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Attempt to place a rail at position that curves to connect with a neighboring rail at toFacing.
         /// May also bend the neighbor rail to form a smooth connection.
         /// </summary>
@@ -63,8 +112,12 @@ namespace VSRails
             Block neibBlock = world.BlockAccessor.GetBlock(neibPos);
             if (neibBlock is not BlockRail) return false;
 
+            // Sloped rails are derived-only and never curve or get bent into curves.
+            string neibType = neibBlock.Variant["type"];
+            if (neibType?.StartsWith("raised_") == true) return false;
+
             BlockFacing fromFacing = toFacing.Opposite;
-            BlockFacing[] neibDirFacings = GetFacingsFromType(neibBlock.Variant["type"]);
+            BlockFacing[] neibDirFacings = GetFacingsFromType(neibType);
             if (neibDirFacings == null || neibDirFacings[0] == null || neibDirFacings[1] == null) return false;
 
             // Already attached on both ends, do default placement behavior
@@ -89,7 +142,7 @@ namespace VSRails
                 return true;
             }
 
-            string dirs = neibBlock.Variant["type"].Split('_')[1];
+            string dirs = neibType.Split('_')[1];
             BlockFacing neibKeepFace = (dirs[0] == neibFreeFace.Code[0]) ? BlockFacing.FromFirstLetter(dirs[1]) : BlockFacing.FromFirstLetter(dirs[0]);
             Block block = GetRailBlock(world, "curved_", neibKeepFace, fromFacing);
             if (block == null) return false;

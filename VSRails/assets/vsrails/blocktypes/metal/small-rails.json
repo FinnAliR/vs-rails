@@ -5,7 +5,8 @@
 
   "attributes": {
     "handbook": {
-      "groupBy": ["rail"]
+      "groupBy": ["rails-*"],
+      "exclude": true
     }
   },
 
@@ -26,20 +27,20 @@
   ],
 
   "creativeinventory": {
-    "general": ["flat_ns"]
+    "general": ["rails-flat_ns"]
   },
 
   "shapeByType": {
-    "curved_es": { "base": "vsrails:block/rail/rail-curve", "rotateY": 0 },
-    "curved_sw": { "base": "vsrails:block/rail/rail-curve", "rotateY": 270 },
-    "curved_wn": { "base": "vsrails:block/rail/rail-curve", "rotateY": 180 },
-    "curved_ne": { "base": "vsrails:block/rail/rail-curve", "rotateY": 90 },
+    "*-curved_es": { "base": "vsrails:block/rail/rail-curve", "rotateY": 0 },
+    "*-curved_sw": { "base": "vsrails:block/rail/rail-curve", "rotateY": 270 },
+    "*-curved_wn": { "base": "vsrails:block/rail/rail-curve", "rotateY": 180 },
+    "*-curved_ne": { "base": "vsrails:block/rail/rail-curve", "rotateY": 90 },
 
-    "flat_ns": { "base": "vsrails:block/rail/rail-flat", "rotateY": 0 },
-    "flat_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
+    "*-flat_ns": { "base": "vsrails:block/rail/rail-flat", "rotateY": 0 },
+    "*-flat_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
 
-    "raised_ns": { "base": "vsrails:block/rail/rail-flat", "rotateY": 0 },
-    "raised_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
+    "*-raised_ns": { "base": "vsrails:block/rail/rail-flat", "rotateY": 0 },
+    "*-raised_we": { "base": "vsrails:block/rail/rail-flat", "rotateY": 90 },
 
     "*": { "base": "vsrails:block/rail/rail-flat" }
   },

@@ -72,33 +72,54 @@ namespace VSRails
         /// </summary>
         private bool TryAttachSlope(IWorldAccessor world, IPlayer byPlayer, ItemStack itemstack, BlockPos position)
         {
+            bool hasHorizontal = false;
+
+            // STEP 1: HARD PRIORITY — detect any horizontal rail first
+            for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
+            {
+                BlockFacing dir = BlockFacing.HORIZONTALS[i];
+                BlockPos pos = position.AddCopy(dir);
+
+                if (world.BlockAccessor.GetBlock(pos) is BlockRail)
+                {
+                    hasHorizontal = true;
+                    break;
+                }
+            }
+
+            // STEP 2: check for vertical relationships (only if no horizontal rails)
+            bool hasUpperRail = false;
+            BlockFacing upperDir = null;
+
             for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
             {
                 BlockFacing dir = BlockFacing.HORIZONTALS[i];
 
-                BlockPos upNeibPos = position.AddCopy(dir).Up();
-                if (world.BlockAccessor.GetBlock(upNeibPos) is BlockRail)
+                BlockPos upPos = position.AddCopy(dir).Up();
+                if (world.BlockAccessor.GetBlock(upPos) is BlockRail)
                 {
-                    Block slopeUp = world.GetBlock(CodeWithParts("raised_" + dir.Code[0]));
-                    if (slopeUp != null)
-                    {
-                        slopeUp.DoPlaceBlock(world, byPlayer, new BlockSelection { Position = position, Face = BlockFacing.UP }, itemstack);
-                        return true;
-                    }
-                }
-
-                BlockPos downNeibPos = position.AddCopy(dir).DownCopy();
-                if (world.BlockAccessor.GetBlock(downNeibPos) is BlockRail)
-                {
-                    Block slopeDown = world.GetBlock(CodeWithParts("raised_" + dir.Opposite.Code[0]));
-                    if (slopeDown != null)
-                    {
-                        slopeDown.DoPlaceBlock(world, byPlayer, new BlockSelection { Position = position, Face = BlockFacing.UP }, itemstack);
-                        return true;
-                    }
+                    hasUpperRail = true;
+                    upperDir = dir;
+                    break;
                 }
             }
 
+            // STEP 3: ONLY slope if upper rail exists
+            if (hasUpperRail && upperDir != null)
+            {
+                Block slope = world.GetBlock(CodeWithParts("raised_" + upperDir.Code[0]));
+                if (slope != null)
+                {
+                    slope.DoPlaceBlock(world, byPlayer,
+                        new BlockSelection { Position = position, Face = BlockFacing.UP },
+                        itemstack);
+
+                    return true;
+                }
+            }
+
+            // STEP 4: IMPORTANT RULE — lower rail does NOTHING for slope decision
+            // It is intentionally ignored here.
             return false;
         }
 

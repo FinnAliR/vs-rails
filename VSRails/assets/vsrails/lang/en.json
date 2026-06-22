@@ -1,5 +1,12 @@
 {
-    "block-vsrails-small-rails": "Small Rail Segment",
-    "entity-vsrails-cart-handcar": "Small Handcar",
-    "entity-vsrails-cart-jonas": "Small Jonas Cart"
+    "block-rails-flat_ns": "Straight Small Rail",
+    "block-rails-flat_we": "Straight Small Rail",
+    "block-rails-curved_es": "Curved Small Rail",
+    "block-rails-curved_sw": "Curved Small Rail",
+    "block-rails-curved_wn": "Curved Small Rail",
+    "block-rails-curved_ne": "Curved Small Rail",
+    "block-rails-raised_ns": "Sloped Small Rail",
+    "block-rails-raised_we": "Sloped Small Rail",
+    "entity-cart-handcar": "Small Handcar",
+    "entity-cart-jonas": "Small Jonas Cart"
 }

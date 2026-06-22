@@ -1,8 +1,10 @@
 ﻿{
-  "code": "cart-jonas",
+  "code": "cartspawner",
   "class": "ItemCreature",
   "creativeinventory": {
     "general": ["*"]
   },
-  "entityCode": "vsrails:cart-jonas"
+  "variantgroups": [
+    { "code": "type", "states": ["cart-jonas"] }
+  ]
 }

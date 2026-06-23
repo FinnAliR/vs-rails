@@ -187,6 +187,13 @@ namespace VSRails
             {
                 if (type == null) return; // not a rail (anymore)
 
+                // A rail that is already satisfied on both ends is locked, exactly like vanilla's
+                // canConnectTo (connectedRails.size() == 2). This stops a new parallel line from
+                // re-curving finished straight rails it merely runs alongside. The lock releases as
+                // soon as one end stops connecting back (e.g. a neighbour was removed or curved away),
+                // letting the rail straighten/re-curve normally.
+                if (IsFullyConnected()) return;
+
                 BlockFacing fallback = AxisFallback(type);
                 string newType = ComputeShape(fallback);
                 if (newType == null || newType == type) return;
@@ -227,6 +234,35 @@ namespace VSRails
 
             /// <summary>Connected if not already joined on both ends, or already joined to that cell.</summary>
             private bool CanConnectTo(BlockPos other) => IsConnectedTo(other) || connected.Count != 2;
+
+            /// <summary>True when both ends join to a rail that joins back — i.e. a finished rail that
+            /// should never be reshaped just because something was placed next to it.</summary>
+            private bool IsFullyConnected()
+            {
+                if (connected.Count != 2) return false;
+                for (int i = 0; i < connected.Count; i++)
+                {
+                    BlockPos c = connected[i];
+                    // Require a rail at the EXACT expected cell (height included) that points back at
+                    // exactly this cell. An X/Z-only match would treat a rail one block up as connected,
+                    // which would wrongly lock a flat rail that should still tilt up into a slope.
+                    if (!(world.BlockAccessor.GetBlock(c) is BlockRail)) return false;
+                    if (!new Rail(block, world, c).ContainsExact(pos)) return false;
+                }
+                return true;
+            }
+
+            /// <summary>True if one of this rail's two ends is exactly at <paramref name="other"/>
+            /// (full X/Y/Z match), used only by the "finished rail" lock.</summary>
+            private bool ContainsExact(BlockPos other)
+            {
+                for (int i = 0; i < connected.Count; i++)
+                {
+                    BlockPos c = connected[i];
+                    if (c.X == other.X && c.Y == other.Y && c.Z == other.Z) return true;
+                }
+                return false;
+            }
 
             /// <summary>Compares X/Z only so an ascending connection (stored at .up()) still matches.</summary>
             private bool IsConnectedTo(BlockPos other)

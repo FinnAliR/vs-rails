@@ -6,10 +6,8 @@ namespace VSRails
     /// <summary>
     /// Handles smart rail placement: straight by default, auto-curves when placed adjacent to existing rails.
     /// Mirrors vanilla BlockRails (Vintagestory.GameContent) placement logic, adapted to this mod's
-    /// "type" variantgroup states: flat_ns, flat_we (straight) | curved_es, curved_sw, curved_wn, curved_ne
-    /// (curves) | raised_ns, raised_we (raised straight). Uses CodeWithParts, matching vanilla, instead
-    /// of CodeWithVariant, since CodeWithParts does direct code-segment substitution and does not depend
-    /// on the variantgroup dictionary resolving "type" at runtime.
+    /// "type" variantgroup states: flat_ns, flat_we (straight) | curved_es, curved_sw, curved_wn, curved_ne (curves) | raised_ns, raised_we (raised straight). Uses CodeWithParts, matching vanilla, instead
+    /// CodeWithParts does direct code-segment substitution and does not depend on the variantgroup dictionary resolving "type" at runtime.
     /// </summary>
     public class BlockRail : Block
     {
@@ -32,15 +30,13 @@ namespace VSRails
                 }
             }
 
-            // 2. No same-plane neighbor found — check one block up/down in each horizontal
-            // direction for a rail to slope toward. Only ever reachable through placement,
-            // never held directly, same as curves.
+            // if no same-plane neighbor found — check for a rail to slope toward.
             if (TryAttachSlope(world, byPlayer, itemstack, blockSel.Position))
             {
                 return true;
             }
 
-            // 3. Fall back to a flat straight rail aligned to look direction.
+            //flat straight rail aligned to look direction.
             if (blockToPlace == null)
             {
                 if (targetFacing.Axis == EnumAxis.Z)
@@ -74,19 +70,6 @@ namespace VSRails
         {
             bool hasHorizontal = false;
 
-            // STEP 1: HARD PRIORITY — detect any horizontal rail first
-            for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
-            {
-                BlockFacing dir = BlockFacing.HORIZONTALS[i];
-                BlockPos pos = position.AddCopy(dir);
-
-                if (world.BlockAccessor.GetBlock(pos) is BlockRail)
-                {
-                    hasHorizontal = true;
-                    break;
-                }
-            }
-
             // STEP 2: check for vertical relationships (only if no horizontal rails)
             bool hasUpperRail = false;
             BlockFacing upperDir = null;
@@ -104,7 +87,7 @@ namespace VSRails
                 }
             }
 
-            // STEP 3: ONLY slope if upper rail exists
+            // ONLY slope if a rail on a block above exists
             if (hasUpperRail && upperDir != null)
             {
                 Block slope = world.GetBlock(CodeWithParts("raised_" + upperDir.Code[0]));
@@ -118,8 +101,6 @@ namespace VSRails
                 }
             }
 
-            // STEP 4: IMPORTANT RULE — lower rail does NOTHING for slope decision
-            // It is intentionally ignored here.
             return false;
         }
 

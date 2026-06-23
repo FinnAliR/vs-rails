@@ -1,215 +1,328 @@
+using System.Collections.Generic;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
 namespace VSRails
 {
     /// <summary>
-    /// Handles smart rail placement: straight by default, auto-curves when placed adjacent to existing rails.
-    /// Mirrors vanilla BlockRails (Vintagestory.GameContent) placement logic, adapted to this mod's
-    /// "type" variantgroup states: flat_ns, flat_we (straight) | curved_es, curved_sw, curved_wn, curved_ne (curves) | raised_ns, raised_we (raised straight). Uses CodeWithParts, matching vanilla, instead
-    /// CodeWithParts does direct code-segment substitution and does not depend on the variantgroup dictionary resolving "type" at runtime.
+    /// Smart rail block, ported from Minecraft's <c>BlockRailBase</c> placing + updating model and
+    /// adapted to this mod's "type" variantgroup states:
+    ///   straight : flat_ns, flat_we
+    ///   curves   : curved_es, curved_sw, curved_wn, curved_ne
+    ///   slopes   : raised_n, raised_s, raised_e, raised_w  (ascending toward that facing)
+    ///
+    /// Like vanilla Minecraft, all rail logic flows through a small <see cref="Rail"/> helper that
+    /// knows which two cells a rail connects, can find rails one block up/down (for slopes), and can
+    /// bend a connectable neighbour to meet a new rail. Placement (<see cref="TryPlaceBlock"/>) mirrors
+    /// <c>BlockRailBase.Rail.place</c>; dynamic updating (<see cref="OnNeighbourBlockChange"/>) mirrors
+    /// <c>BlockRailBase.neighborChanged -&gt; updateState</c> so rails re-curve, straighten or raise
+    /// themselves whenever an adjacent rail is added or removed.
+    ///
+    /// Unlike Minecraft (where rail shape is a blockstate property), each shape here is a separate
+    /// block variant, so "set the shape" means swapping to the sibling block resolved via
+    /// <see cref="ResolveRail"/> (CodeWithParts), and in-place shape swaps use ExchangeBlock so they
+    /// don't churn block entities or cascade neighbour events.
     /// </summary>
     public class BlockRail : Block
     {
+        private const string FlatNS = "flat_ns";
+        private const string FlatWE = "flat_we";
+
+        // ---------------------------------------------------------------------------------------
+        // Placement  (mirrors BlockRailBase.onBlockAdded -> updateDir -> Rail.place)
+        // ---------------------------------------------------------------------------------------
+
         public override bool TryPlaceBlock(IWorldAccessor world, IPlayer byPlayer, ItemStack itemstack, BlockSelection blockSel, ref string failureCode)
         {
             if (!CanPlaceBlock(world, byPlayer, blockSel, ref failureCode))
                 return false;
 
-            // 1. PURE neighbor-driven logic first (no player input involved)
-            for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
-            {
-                BlockFacing facing = BlockFacing.HORIZONTALS[i];
+            BlockPos pos = blockSel.Position;
 
-                if (TryAttachPlaceToHorizontal(world, byPlayer, blockSel.Position, facing))
-                    return true;
-            }
-
-            if (TryAttachSlope(world, byPlayer, itemstack, blockSel.Position))
-                return true;
-
-            TryAttachSlopeUpdateNeighbor(world, byPlayer, blockSel.Position);
-
-            // 2. ONLY NOW use player direction
+            // Decide the shape purely from connectable neighbours; fall back to the player's facing
+            // when nothing connects (this mod snaps a lone rail to the way the player looks).
             BlockFacing playerFacing = SuggestedHVOrientation(byPlayer, blockSel)[0];
+            string type = new Rail(this, world, pos).ComputeShape(playerFacing);
 
-            Block blockToPlace =
-                playerFacing.Axis == EnumAxis.Z
-                    ? world.GetBlock(CodeWithParts("flat_ns"))
-                    : world.GetBlock(CodeWithParts("flat_we"));
-
-            if (blockToPlace == null)
+            Block toPlace = ResolveRail(world, type);
+            if (toPlace == null)
             {
                 failureCode = "missingblock";
                 return false;
             }
 
-            blockToPlace.DoPlaceBlock(world, byPlayer, blockSel, itemstack);
+            toPlace.DoPlaceBlock(world, byPlayer, blockSel, itemstack);
+
+            // Let every reachable neighbour (same level + one up/down, for slopes) re-evaluate so it
+            // bends to meet the rail we just placed. Mirrors place()'s connectTo loop.
+            if (world.Side.IsServer())
+                UpdateNeighbours(world, pos);
+
             return true;
         }
 
-        /// <summary>
-        /// Checks each horizontal direction for a rail one block up or one block down from
-        /// position. If found one block up in direction D, places a raised_D slope here (high
-        /// end faces D, toward the elevated neighbor). If found one block down in direction D,
-        /// places a raised_(opposite of D) slope here (this is the upper end, sloping down
-        /// toward D). Only fires when no same-plane neighbor was found.
-        /// </summary>
-        private bool TryAttachSlope(IWorldAccessor world, IPlayer byPlayer, ItemStack itemstack, BlockPos position)
+        // ---------------------------------------------------------------------------------------
+        // Updating  (mirrors BlockRailBase.neighborChanged -> updateState)
+        // ---------------------------------------------------------------------------------------
+
+        public override void OnNeighbourBlockChange(IWorldAccessor world, BlockPos pos, BlockPos neibpos)
+        {
+            base.OnNeighbourBlockChange(world, pos, neibpos);
+            if (world.Side.IsClient()) return;
+
+            // A neighbouring block changed: re-evaluate our own shape from the rails around us.
+            new Rail(this, world, pos).UpdateShape();
+        }
+
+        /// <summary>Re-evaluate every rail reachable from <paramref name="pos"/> (the four horizontals,
+        /// plus one block up and one down each, so slopes connect). Used right after placing a rail.</summary>
+        private void UpdateNeighbours(IWorldAccessor world, BlockPos pos)
         {
             for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
             {
                 BlockFacing dir = BlockFacing.HORIZONTALS[i];
-
-                BlockPos upPos = position.AddCopy(dir).Up();
-                if (world.BlockAccessor.GetBlock(upPos) is BlockRail)
+                for (int dy = -1; dy <= 1; dy++)
                 {
-                    Block slope = world.GetBlock(CodeWithParts("raised_" + dir.Code[0]));
-                    if (slope != null)
-                    {
-                        slope.DoPlaceBlock(world, byPlayer,
-                            new BlockSelection { Position = position, Face = BlockFacing.UP },
-                            itemstack);
+                    BlockPos p = pos.AddCopy(dir);
+                    if (dy > 0) p.Up(dy);
+                    else if (dy < 0) p.Down(-dy);
 
-                        return true;
+                    if (world.BlockAccessor.GetBlock(p) is BlockRail)
+                        new Rail(this, world, p).UpdateShape();
+                }
+            }
+        }
+
+        /// <summary>Resolve the sibling rail block for a given "type" state via CodeWithParts,
+        /// matching vanilla's direct code-segment substitution.</summary>
+        internal Block ResolveRail(IWorldAccessor world, string type)
+        {
+            return type == null ? null : world.GetBlock(CodeWithParts(type));
+        }
+
+        // ---------------------------------------------------------------------------------------
+        // Rail: the connection model, ported from BlockRailBase.Rail
+        // ---------------------------------------------------------------------------------------
+
+        private class Rail
+        {
+            private readonly BlockRail block;          // resolver for sibling shapes (any rail instance works)
+            private readonly IWorldAccessor world;
+            private readonly BlockPos pos;
+            private string type;                       // current shape state, or null if pos isn't a rail yet
+            private List<BlockPos> connected;          // the (up to two) cells this rail joins to
+
+            public Rail(BlockRail block, IWorldAccessor world, BlockPos pos)
+            {
+                this.block = block;
+                this.world = world;
+                this.pos = pos;
+
+                if (world.BlockAccessor.GetBlock(pos) is BlockRail rail)
+                {
+                    this.type = rail.Variant["type"];
+                    this.connected = ConnectionsFor(this.type, pos);
+                }
+                else
+                {
+                    this.connected = new List<BlockPos>();
+                }
+            }
+
+            // ---- shape decision (BlockRailBase.Rail.place, non-powered branch) ----------------
+
+            /// <summary>Pick the best shape from connectable neighbours; <paramref name="fallback"/>
+            /// orients a lone rail when nothing connects.</summary>
+            public string ComputeShape(BlockFacing fallback)
+            {
+                bool n = HasNeighbourRail(BlockFacing.NORTH);
+                bool s = HasNeighbourRail(BlockFacing.SOUTH);
+                bool w = HasNeighbourRail(BlockFacing.WEST);
+                bool e = HasNeighbourRail(BlockFacing.EAST);
+
+                string t = null;
+
+                if ((n || s) && !w && !e) t = FlatNS;
+                if ((w || e) && !n && !s) t = FlatWE;
+
+                // exact two-way curves
+                if (s && e && !n && !w) t = "curved_es";
+                if (s && w && !n && !e) t = "curved_sw";
+                if (n && w && !s && !e) t = "curved_wn";
+                if (n && e && !s && !w) t = "curved_ne";
+
+                // 3+/ambiguous junction: prefer a straight, then a curve (mirrors place()'s fallback)
+                if (t == null)
+                {
+                    if (n || s) t = FlatNS;
+                    if (w || e) t = FlatWE;
+                    if (n && w) t = "curved_wn";
+                    if (e && n) t = "curved_ne";
+                    if (w && s) t = "curved_sw";
+                    if (s && e) t = "curved_es";
+                }
+
+                // nothing connects: keep the requested/own orientation
+                if (t == null)
+                    t = (fallback != null && fallback.Axis == EnumAxis.X) ? FlatWE : FlatNS;
+
+                // ascending overrides: a straight rail climbs toward a rail sitting one block up
+                if (t == FlatNS)
+                {
+                    if (IsRailAt(pos.AddCopy(BlockFacing.NORTH).Up())) t = "raised_n";
+                    else if (IsRailAt(pos.AddCopy(BlockFacing.SOUTH).Up())) t = "raised_s";
+                }
+                else if (t == FlatWE)
+                {
+                    if (IsRailAt(pos.AddCopy(BlockFacing.EAST).Up())) t = "raised_e";
+                    else if (IsRailAt(pos.AddCopy(BlockFacing.WEST).Up())) t = "raised_w";
+                }
+
+                return t;
+            }
+
+            /// <summary>Recompute this rail's shape and swap to it in place if it changed.
+            /// Keeps the rail's current orientation as the fallback so isolated rails don't flip.</summary>
+            public void UpdateShape()
+            {
+                if (type == null) return; // not a rail (anymore)
+
+                BlockFacing fallback = AxisFallback(type);
+                string newType = ComputeShape(fallback);
+                if (newType == null || newType == type) return;
+
+                Block nb = block.ResolveRail(world, newType);
+                if (nb == null) return;
+
+                world.BlockAccessor.ExchangeBlock(nb.Id, pos);
+                type = newType;
+                connected = ConnectionsFor(newType, pos);
+            }
+
+            // ---- neighbour queries (BlockRailBase.Rail.hasNeighborRail / findRailAt / canConnectTo) ----
+
+            private bool HasNeighbourRail(BlockFacing dir)
+            {
+                Rail r = FindRailAt(pos.AddCopy(dir));
+                if (r == null) return false;
+                r.RemoveSoftConnections();
+                return r.CanConnectTo(pos);
+            }
+
+            /// <summary>Find a rail at <paramref name="at"/>, or one block above/below it (slopes).</summary>
+            private Rail FindRailAt(BlockPos at)
+            {
+                if (world.BlockAccessor.GetBlock(at) is BlockRail) return new Rail(block, world, at);
+
+                BlockPos up = at.UpCopy(1);
+                if (world.BlockAccessor.GetBlock(up) is BlockRail) return new Rail(block, world, up);
+
+                BlockPos down = at.DownCopy(1);
+                if (world.BlockAccessor.GetBlock(down) is BlockRail) return new Rail(block, world, down);
+
+                return null;
+            }
+
+            private bool IsRailAt(BlockPos at) => world.BlockAccessor.GetBlock(at) is BlockRail;
+
+            /// <summary>Connected if not already joined on both ends, or already joined to that cell.</summary>
+            private bool CanConnectTo(BlockPos other) => IsConnectedTo(other) || connected.Count != 2;
+
+            /// <summary>Compares X/Z only so an ascending connection (stored at .up()) still matches.</summary>
+            private bool IsConnectedTo(BlockPos other)
+            {
+                for (int i = 0; i < connected.Count; i++)
+                {
+                    BlockPos c = connected[i];
+                    if (c.X == other.X && c.Z == other.Z) return true;
+                }
+                return false;
+            }
+
+            /// <summary>Drop connections that no longer point at a rail that points back at us.</summary>
+            private void RemoveSoftConnections()
+            {
+                for (int i = 0; i < connected.Count; i++)
+                {
+                    Rail r = FindRailAt(connected[i]);
+                    if (r != null && r.IsConnectedTo(pos))
+                    {
+                        connected[i] = r.pos;
+                    }
+                    else
+                    {
+                        connected.RemoveAt(i--);
                     }
                 }
             }
 
-            return false;
-        }
-        
-        /// <summary>
-        /// Checks each horizontal direction for an existing flat rail one block down and one
-        /// block back from position. If found in direction D, that flat rail's open end faces
-        /// toward this position — convert it from flat to raised_D, climbing up to meet the
-        /// new block here. Does not affect placement at `position` itself.
-        /// </summary>
-        private void TryAttachSlopeUpdateNeighbor(IWorldAccessor world, IPlayer byPlayer, BlockPos position)
-        {
-            for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
+            // ---- static tables ---------------------------------------------------------------
+
+            /// <summary>The two cells a given shape connects to (ascending ends are stored one block up).</summary>
+            private static List<BlockPos> ConnectionsFor(string type, BlockPos pos)
             {
-                BlockFacing dir = BlockFacing.HORIZONTALS[i];
+                var list = new List<BlockPos>(2);
+                if (type == null) return list;
 
-                BlockPos belowPos = position.AddCopy(dir.Opposite).Down();
-                Block neibBlock = world.BlockAccessor.GetBlock(belowPos);
-                if (neibBlock is not BlockRail) continue;
-
-                string neibType = neibBlock.Variant["type"];
-                bool isNS = dir.Axis == EnumAxis.Z;
-                if (isNS && neibType != "flat_ns") continue;
-                if (!isNS && neibType != "flat_we") continue;
-
-                Block slope = world.GetBlock(CodeWithParts("raised_" + dir.Code[0]));
-                if (slope == null) continue;
-
-                slope.DoPlaceBlock(world, byPlayer,
-                    new BlockSelection { Position = belowPos, Face = BlockFacing.UP },
-                    null);
-
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Attempt to place a rail at position that curves to connect with a neighboring rail at toFacing.
-        /// May also bend the neighbor rail to form a smooth connection.
-        /// </summary>
-        private bool TryAttachPlaceToHorizontal(IWorldAccessor world, IPlayer byPlayer, BlockPos position, BlockFacing toFacing)
-        {
-            BlockPos neibPos = position.AddCopy(toFacing);
-            Block neibBlock = world.BlockAccessor.GetBlock(neibPos);
-            if (neibBlock is not BlockRail) return false;
-
-            // Sloped rails are derived-only and never curve or get bent into curves.
-            string neibType = neibBlock.Variant["type"];
-            if (neibType?.StartsWith("raised_") == true) return false;
-
-            BlockFacing fromFacing = toFacing.Opposite;
-            BlockFacing[] neibDirFacings = GetFacingsFromType(neibType);
-            if (neibDirFacings == null || neibDirFacings[0] == null || neibDirFacings[1] == null) return false;
-
-            // Already attached on both ends, do default placement behavior
-            if (world.BlockAccessor.GetBlock(neibPos.AddCopy(neibDirFacings[0])) is BlockRail &&
-                world.BlockAccessor.GetBlock(neibPos.AddCopy(neibDirFacings[1])) is BlockRail)
-            {
-                return false;
-            }
-
-            BlockFacing neibFreeFace = GetOpenEndedFace(neibDirFacings, world, position.AddCopy(toFacing));
-            // Already fully attached, don't bend rail
-            if (neibFreeFace == null) return false;
-
-            Block blockToPlace = GetRailBlock(world, "curved_", toFacing, fromFacing);
-
-            if (blockToPlace != null)
-            {
-                if (!PlaceIfSuitable(world, byPlayer, blockToPlace, position))
+                switch (type)
                 {
-                    return false;
+                    case FlatNS:
+                        list.Add(pos.AddCopy(BlockFacing.NORTH));
+                        list.Add(pos.AddCopy(BlockFacing.SOUTH));
+                        break;
+                    case FlatWE:
+                        list.Add(pos.AddCopy(BlockFacing.WEST));
+                        list.Add(pos.AddCopy(BlockFacing.EAST));
+                        break;
+                    case "curved_es":
+                        list.Add(pos.AddCopy(BlockFacing.EAST));
+                        list.Add(pos.AddCopy(BlockFacing.SOUTH));
+                        break;
+                    case "curved_sw":
+                        list.Add(pos.AddCopy(BlockFacing.WEST));
+                        list.Add(pos.AddCopy(BlockFacing.SOUTH));
+                        break;
+                    case "curved_wn":
+                        list.Add(pos.AddCopy(BlockFacing.WEST));
+                        list.Add(pos.AddCopy(BlockFacing.NORTH));
+                        break;
+                    case "curved_ne":
+                        list.Add(pos.AddCopy(BlockFacing.EAST));
+                        list.Add(pos.AddCopy(BlockFacing.NORTH));
+                        break;
+                    case "raised_n":
+                        list.Add(pos.AddCopy(BlockFacing.NORTH).Up());
+                        list.Add(pos.AddCopy(BlockFacing.SOUTH));
+                        break;
+                    case "raised_s":
+                        list.Add(pos.AddCopy(BlockFacing.SOUTH).Up());
+                        list.Add(pos.AddCopy(BlockFacing.NORTH));
+                        break;
+                    case "raised_e":
+                        list.Add(pos.AddCopy(BlockFacing.EAST).Up());
+                        list.Add(pos.AddCopy(BlockFacing.WEST));
+                        break;
+                    case "raised_w":
+                        list.Add(pos.AddCopy(BlockFacing.WEST).Up());
+                        list.Add(pos.AddCopy(BlockFacing.EAST));
+                        break;
                 }
-                return true;
+                return list;
             }
 
-            string dirs = neibType.Split('_')[1];
-            BlockFacing neibKeepFace = (dirs[0] == neibFreeFace.Code[0]) ? BlockFacing.FromFirstLetter(dirs[1]) : BlockFacing.FromFirstLetter(dirs[0]);
-            Block block = GetRailBlock(world, "curved_", neibKeepFace, fromFacing);
-            if (block == null) return false;
-
-            block.DoPlaceBlock(world, byPlayer, new BlockSelection { Position = position.AddCopy(toFacing), Face = BlockFacing.UP }, null);
-
-            return false;
-        }
-
-        private bool PlaceIfSuitable(IWorldAccessor world, IPlayer byPlayer, Block block, BlockPos pos)
-        {
-            string failureCode = "";
-            BlockSelection blockSel = new BlockSelection { Position = pos, Face = BlockFacing.UP };
-            if (block.CanPlaceBlock(world, byPlayer, blockSel, ref failureCode))
+            /// <summary>Orientation to keep when a rail loses all neighbours (so it doesn't flip axis).</summary>
+            private static BlockFacing AxisFallback(string type)
             {
-                block.DoPlaceBlock(world, byPlayer, blockSel, null);
-                return true;
+                switch (type)
+                {
+                    case FlatWE:
+                    case "raised_e":
+                    case "raised_w":
+                        return BlockFacing.EAST;   // X axis -> flat_we
+                    default:
+                        return BlockFacing.NORTH;  // Z axis -> flat_ns
+                }
             }
-            return false;
-        }
-
-        /// <summary>
-        /// Look up a curved rail variant connecting two facings (tries both letter orderings),
-        /// using CodeWithParts to match vanilla's direct code-segment substitution.
-        /// </summary>
-        private Block GetRailBlock(IWorldAccessor world, string prefix, BlockFacing dir0, BlockFacing dir1)
-        {
-            Block block = world.GetBlock(CodeWithParts(prefix + dir0.Code[0] + dir1.Code[0]));
-            if (block != null) return block;
-
-            return world.GetBlock(CodeWithParts(prefix + dir1.Code[0] + dir0.Code[0]));
-        }
-
-        private BlockFacing GetOpenEndedFace(BlockFacing[] dirFacings, IWorldAccessor world, BlockPos blockPos)
-        {
-            Block block = world.BlockAccessor.GetBlock(blockPos.AddCopy(dirFacings[0]));
-            if (block is not BlockRail) return dirFacings[0];
-
-            block = world.BlockAccessor.GetBlock(blockPos.AddCopy(dirFacings[1]));
-            if (block is not BlockRail) return dirFacings[1];
-
-            return null;
-        }
-
-        /// <summary>
-        /// Extract the two BlockFacings implied by a "type" variant state, e.g. "flat_ns" -> N+S,
-        /// "curved_es" -> E+S. Splits on '_' and reads the two letters, matching vanilla's approach
-        /// (works uniformly for flat_*, raised_*, and curved_* without needing separate cases).
-        /// </summary>
-        private static BlockFacing[] GetFacingsFromType(string type)
-        {
-            if (string.IsNullOrEmpty(type)) return null;
-
-            string[] parts = type.Split('_');
-            if (parts.Length < 2 || parts[1].Length < 2) return null;
-
-            string codes = parts[1];
-            return new[] { BlockFacing.FromFirstLetter(codes[0]), BlockFacing.FromFirstLetter(codes[1]) };
         }
     }
 }

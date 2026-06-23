@@ -36,7 +36,11 @@ namespace VSRails
                 return true;
             }
 
-            //flat straight rail aligned to look direction.
+            //Retroactively convert an existing flat rail one-down-and-back into a slope,
+            //climbing up to meet this new block. Doesn't claim this block's own placement.
+            TryAttachSlopeUpdateNeighbor(world, byPlayer, blockSel.Position);
+            
+            // flat straight rail aligned to look direction.
             if (blockToPlace == null)
             {
                 if (targetFacing.Axis == EnumAxis.Z)
@@ -68,12 +72,6 @@ namespace VSRails
         /// </summary>
         private bool TryAttachSlope(IWorldAccessor world, IPlayer byPlayer, ItemStack itemstack, BlockPos position)
         {
-            bool hasHorizontal = false;
-
-            // STEP 2: check for vertical relationships (only if no horizontal rails)
-            bool hasUpperRail = false;
-            BlockFacing upperDir = null;
-
             for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
             {
                 BlockFacing dir = BlockFacing.HORIZONTALS[i];
@@ -81,27 +79,51 @@ namespace VSRails
                 BlockPos upPos = position.AddCopy(dir).Up();
                 if (world.BlockAccessor.GetBlock(upPos) is BlockRail)
                 {
-                    hasUpperRail = true;
-                    upperDir = dir;
-                    break;
-                }
-            }
+                    Block slope = world.GetBlock(CodeWithParts("raised_" + dir.Code[0]));
+                    if (slope != null)
+                    {
+                        slope.DoPlaceBlock(world, byPlayer,
+                            new BlockSelection { Position = position, Face = BlockFacing.UP },
+                            itemstack);
 
-            // ONLY slope if a rail on a block above exists
-            if (hasUpperRail && upperDir != null)
-            {
-                Block slope = world.GetBlock(CodeWithParts("raised_" + upperDir.Code[0]));
-                if (slope != null)
-                {
-                    slope.DoPlaceBlock(world, byPlayer,
-                        new BlockSelection { Position = position, Face = BlockFacing.UP },
-                        itemstack);
-
-                    return true;
+                        return true;
+                    }
                 }
             }
 
             return false;
+        }
+        
+        /// <summary>
+        /// Checks each horizontal direction for an existing flat rail one block down and one
+        /// block back from position. If found in direction D, that flat rail's open end faces
+        /// toward this position — convert it from flat to raised_D, climbing up to meet the
+        /// new block here. Does not affect placement at `position` itself.
+        /// </summary>
+        private void TryAttachSlopeUpdateNeighbor(IWorldAccessor world, IPlayer byPlayer, BlockPos position)
+        {
+            for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
+            {
+                BlockFacing dir = BlockFacing.HORIZONTALS[i];
+
+                BlockPos belowPos = position.AddCopy(dir.Opposite).Down();
+                Block neibBlock = world.BlockAccessor.GetBlock(belowPos);
+                if (neibBlock is not BlockRail) continue;
+
+                string neibType = neibBlock.Variant["type"];
+                bool isNS = dir.Axis == EnumAxis.Z;
+                if (isNS && neibType != "flat_ns") continue;
+                if (!isNS && neibType != "flat_we") continue;
+
+                Block slope = world.GetBlock(CodeWithParts("raised_" + dir.Code[0]));
+                if (slope == null) continue;
+
+                slope.DoPlaceBlock(world, byPlayer,
+                    new BlockSelection { Position = belowPos, Face = BlockFacing.UP },
+                    null);
+
+                return;
+            }
         }
 
         /// <summary>

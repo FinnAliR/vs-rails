@@ -13,10 +13,17 @@ namespace VSRails
     ///
     /// Like vanilla Minecraft, all rail logic flows through a small <see cref="Rail"/> helper that
     /// knows which two cells a rail connects, can find rails one block up/down (for slopes), and can
-    /// bend a connectable neighbour to meet a new rail. Placement (<see cref="TryPlaceBlock"/>) mirrors
-    /// <c>BlockRailBase.Rail.place</c>; dynamic updating (<see cref="OnNeighbourBlockChange"/>) mirrors
-    /// <c>BlockRailBase.neighborChanged -&gt; updateState</c> so rails re-curve, straighten or raise
-    /// themselves whenever an adjacent rail is added or removed.
+    /// bend a connectable neighbour to meet a new rail.
+    ///
+    /// Update model (faithful to <c>BlockRailBase.Rail.place</c>): shapes change ONLY when a rail is
+    /// placed. The freshly placed rail picks its own shape by scanning connectable neighbours
+    /// (<see cref="Rail.ComputeShape"/>), then runs the same cascade vanilla does at the end of
+    /// <c>place()</c> — it asks each of the (up to two) rails it actually connects to, to bend toward
+    /// it via <see cref="Rail.ConnectTo"/>. <c>ConnectTo</c> recomputes a neighbour's shape from that
+    /// neighbour's OWN committed connection list (not a fresh world scan), so finished track running
+    /// alongside is never reshaped, and a flat rail that should climb becomes a slope rather than a
+    /// flat corner. Like vanilla, a settled regular rail does NOT re-evaluate itself just because an
+    /// adjacent block changed; it only drops when it loses support (handled by the Unstable behavior).
     ///
     /// Unlike Minecraft (where rail shape is a blockstate property), each shape here is a separate
     /// block variant, so "set the shape" means swapping to the sibling block resolved via
@@ -53,45 +60,24 @@ namespace VSRails
 
             toPlace.DoPlaceBlock(world, byPlayer, blockSel, itemstack);
 
-            // Let every reachable neighbour (same level + one up/down, for slopes) re-evaluate so it
-            // bends to meet the rail we just placed. Mirrors place()'s connectTo loop.
+            // Mirror the final loop of BlockRailBase.Rail.place(): tell each rail we actually connect
+            // to, to bend toward us via ConnectTo. We deliberately do NOT rescan unrelated rails, so
+            // a finished slope or line merely running past is never reshaped just for being adjacent.
             if (world.Side.IsServer())
-                UpdateNeighbours(world, pos);
+                new Rail(this, world, pos).ConnectNeighbours();
 
             return true;
         }
 
         // ---------------------------------------------------------------------------------------
-        // Updating  (mirrors BlockRailBase.neighborChanged -> updateState)
+        // Updating  (mirrors BlockRailBase.neighborChanged)
         // ---------------------------------------------------------------------------------------
 
-        public override void OnNeighbourBlockChange(IWorldAccessor world, BlockPos pos, BlockPos neibpos)
-        {
-            base.OnNeighbourBlockChange(world, pos, neibpos);
-            if (world.Side.IsClient()) return;
-
-            // A neighbouring block changed: re-evaluate our own shape from the rails around us.
-            new Rail(this, world, pos).UpdateShape();
-        }
-
-        /// <summary>Re-evaluate every rail reachable from <paramref name="pos"/> (the four horizontals,
-        /// plus one block up and one down each, so slopes connect). Used right after placing a rail.</summary>
-        private void UpdateNeighbours(IWorldAccessor world, BlockPos pos)
-        {
-            for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
-            {
-                BlockFacing dir = BlockFacing.HORIZONTALS[i];
-                for (int dy = -1; dy <= 1; dy++)
-                {
-                    BlockPos p = pos.AddCopy(dir);
-                    if (dy > 0) p.Up(dy);
-                    else if (dy < 0) p.Down(-dy);
-
-                    if (world.BlockAccessor.GetBlock(p) is BlockRail)
-                        new Rail(this, world, p).UpdateShape();
-                }
-            }
-        }
+        // Vanilla regular rails do NOT recompute their shape when an adjacent block changes — that is
+        // why a finished slope/curve keeps its shape and never silently re-curves. They only need to
+        // drop when they lose the solid block beneath them, which the Unstable behavior already does
+        // via the base handler. So there is intentionally no shape re-evaluation here; all reshaping
+        // happens through the placement cascade (TryPlaceBlock -> ConnectNeighbours -> ConnectTo).
 
         /// <summary>Resolve the sibling rail block for a given "type" state via CodeWithParts,
         /// matching vanilla's direct code-segment substitution.</summary>
@@ -181,29 +167,67 @@ namespace VSRails
                 return t;
             }
 
-            /// <summary>Recompute this rail's shape and swap to it in place if it changed.
-            /// Keeps the rail's current orientation as the fallback so isolated rails don't flip.</summary>
-            public void UpdateShape()
+            /// <summary>Mirror the cascade at the end of <c>BlockRailBase.Rail.place()</c>: for each
+            /// cell this rail connects to, find the rail there (incl. one up/down for slopes), prune
+            /// its stale connections, and—if it can still take another connection—ask it to bend
+            /// toward us via <see cref="ConnectTo"/>. This is the ONLY path that reshapes neighbours.</summary>
+            public void ConnectNeighbours()
             {
-                if (type == null) return; // not a rail (anymore)
+                if (type == null) return;
+                for (int i = 0; i < connected.Count; i++)
+                {
+                    Rail r = FindRailAt(connected[i]);
+                    if (r == null) continue;
+                    r.RemoveSoftConnections();
+                    if (r.CanConnectTo(pos)) r.ConnectTo(this);
+                }
+            }
 
-                // A rail that is already satisfied on both ends is locked, exactly like vanilla's
-                // canConnectTo (connectedRails.size() == 2). This stops a new parallel line from
-                // re-curving finished straight rails it merely runs alongside. The lock releases as
-                // soon as one end stops connecting back (e.g. a neighbour was removed or curved away),
-                // letting the rail straighten/re-curve normally.
-                if (IsFullyConnected()) return;
+            /// <summary>Port of <c>BlockRailBase.Rail.connectTo</c> (func_150645_c). Adds
+            /// <paramref name="other"/> as a connection, then re-derives this rail's shape from its OWN
+            /// connection list (X/Z matches via <see cref="IsConnectedTo"/>) rather than a fresh world
+            /// scan. Because the decision is driven by committed connections, a straight run that
+            /// should climb resolves to a slope instead of being pulled into a flat corner.</summary>
+            private void ConnectTo(Rail other)
+            {
+                if (type == null) return;
+                connected.Add(other.pos);
 
-                BlockFacing fallback = AxisFallback(type);
-                string newType = ComputeShape(fallback);
-                if (newType == null || newType == type) return;
+                bool n = IsConnectedTo(pos.AddCopy(BlockFacing.NORTH));
+                bool s = IsConnectedTo(pos.AddCopy(BlockFacing.SOUTH));
+                bool w = IsConnectedTo(pos.AddCopy(BlockFacing.WEST));
+                bool e = IsConnectedTo(pos.AddCopy(BlockFacing.EAST));
 
-                Block nb = block.ResolveRail(world, newType);
+                string t = null;
+                if (n || s) t = FlatNS;
+                if (w || e) t = FlatWE;
+
+                if (s && e && !n && !w) t = "curved_es";
+                if (s && w && !n && !e) t = "curved_sw";
+                if (n && w && !s && !e) t = "curved_wn";
+                if (n && e && !s && !w) t = "curved_ne";
+
+                // straight rails climb toward a rail sitting one block up (vanilla ASCENDING_*)
+                if (t == FlatNS)
+                {
+                    if (IsRailAt(pos.AddCopy(BlockFacing.NORTH).Up())) t = "raised_n";
+                    if (IsRailAt(pos.AddCopy(BlockFacing.SOUTH).Up())) t = "raised_s";
+                }
+                else if (t == FlatWE)
+                {
+                    if (IsRailAt(pos.AddCopy(BlockFacing.EAST).Up())) t = "raised_e";
+                    if (IsRailAt(pos.AddCopy(BlockFacing.WEST).Up())) t = "raised_w";
+                }
+
+                if (t == null) t = FlatNS;
+                if (t == type) return;
+
+                Block nb = block.ResolveRail(world, t);
                 if (nb == null) return;
 
                 world.BlockAccessor.ExchangeBlock(nb.Id, pos);
-                type = newType;
-                connected = ConnectionsFor(newType, pos);
+                type = t;
+                connected = ConnectionsFor(t, pos);
             }
 
             // ---- neighbour queries (BlockRailBase.Rail.hasNeighborRail / findRailAt / canConnectTo) ----
@@ -234,35 +258,6 @@ namespace VSRails
 
             /// <summary>Connected if not already joined on both ends, or already joined to that cell.</summary>
             private bool CanConnectTo(BlockPos other) => IsConnectedTo(other) || connected.Count != 2;
-
-            /// <summary>True when both ends join to a rail that joins back — i.e. a finished rail that
-            /// should never be reshaped just because something was placed next to it.</summary>
-            private bool IsFullyConnected()
-            {
-                if (connected.Count != 2) return false;
-                for (int i = 0; i < connected.Count; i++)
-                {
-                    BlockPos c = connected[i];
-                    // Require a rail at the EXACT expected cell (height included) that points back at
-                    // exactly this cell. An X/Z-only match would treat a rail one block up as connected,
-                    // which would wrongly lock a flat rail that should still tilt up into a slope.
-                    if (!(world.BlockAccessor.GetBlock(c) is BlockRail)) return false;
-                    if (!new Rail(block, world, c).ContainsExact(pos)) return false;
-                }
-                return true;
-            }
-
-            /// <summary>True if one of this rail's two ends is exactly at <paramref name="other"/>
-            /// (full X/Y/Z match), used only by the "finished rail" lock.</summary>
-            private bool ContainsExact(BlockPos other)
-            {
-                for (int i = 0; i < connected.Count; i++)
-                {
-                    BlockPos c = connected[i];
-                    if (c.X == other.X && c.Y == other.Y && c.Z == other.Z) return true;
-                }
-                return false;
-            }
 
             /// <summary>Compares X/Z only so an ascending connection (stored at .up()) still matches.</summary>
             private bool IsConnectedTo(BlockPos other)
@@ -344,20 +339,6 @@ namespace VSRails
                         break;
                 }
                 return list;
-            }
-
-            /// <summary>Orientation to keep when a rail loses all neighbours (so it doesn't flip axis).</summary>
-            private static BlockFacing AxisFallback(string type)
-            {
-                switch (type)
-                {
-                    case FlatWE:
-                    case "raised_e":
-                    case "raised_w":
-                        return BlockFacing.EAST;   // X axis -> flat_we
-                    default:
-                        return BlockFacing.NORTH;  // Z axis -> flat_ns
-                }
             }
         }
     }

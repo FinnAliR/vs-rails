@@ -16,42 +16,27 @@ namespace VSRails
             if (!CanPlaceBlock(world, byPlayer, blockSel, ref failureCode))
                 return false;
 
-            // Place by looking direction
-            BlockFacing targetFacing = SuggestedHVOrientation(byPlayer, blockSel)[0];
-            Block blockToPlace = null;
-
-            // 1. Same-plane neighbor attachment (existing curve logic) takes priority.
+            // 1. PURE neighbor-driven logic first (no player input involved)
             for (int i = 0; i < BlockFacing.HORIZONTALS.Length; i++)
             {
                 BlockFacing facing = BlockFacing.HORIZONTALS[i];
-                if (TryAttachPlaceToHorizontal(world, byPlayer, blockSel.Position, facing, targetFacing))
-                {
+
+                if (TryAttachPlaceToHorizontal(world, byPlayer, blockSel.Position, facing))
                     return true;
-                }
             }
 
-            // if no same-plane neighbor found — check for a rail to slope toward.
             if (TryAttachSlope(world, byPlayer, itemstack, blockSel.Position))
-            {
                 return true;
-            }
 
-            //Retroactively convert an existing flat rail one-down-and-back into a slope,
-            //climbing up to meet this new block. Doesn't claim this block's own placement.
             TryAttachSlopeUpdateNeighbor(world, byPlayer, blockSel.Position);
-            
-            // flat straight rail aligned to look direction.
-            if (blockToPlace == null)
-            {
-                if (targetFacing.Axis == EnumAxis.Z)
-                {
-                    blockToPlace = world.GetBlock(CodeWithParts("flat_ns"));
-                }
-                else
-                {
-                    blockToPlace = world.GetBlock(CodeWithParts("flat_we"));
-                }
-            }
+
+            // 2. ONLY NOW use player direction
+            BlockFacing playerFacing = SuggestedHVOrientation(byPlayer, blockSel)[0];
+
+            Block blockToPlace =
+                playerFacing.Axis == EnumAxis.Z
+                    ? world.GetBlock(CodeWithParts("flat_ns"))
+                    : world.GetBlock(CodeWithParts("flat_we"));
 
             if (blockToPlace == null)
             {
@@ -130,7 +115,7 @@ namespace VSRails
         /// Attempt to place a rail at position that curves to connect with a neighboring rail at toFacing.
         /// May also bend the neighbor rail to form a smooth connection.
         /// </summary>
-        private bool TryAttachPlaceToHorizontal(IWorldAccessor world, IPlayer byPlayer, BlockPos position, BlockFacing toFacing, BlockFacing targetFacing)
+        private bool TryAttachPlaceToHorizontal(IWorldAccessor world, IPlayer byPlayer, BlockPos position, BlockFacing toFacing)
         {
             BlockPos neibPos = position.AddCopy(toFacing);
             Block neibBlock = world.BlockAccessor.GetBlock(neibPos);
@@ -155,7 +140,7 @@ namespace VSRails
             // Already fully attached, don't bend rail
             if (neibFreeFace == null) return false;
 
-            Block blockToPlace = GetRailBlock(world, "curved_", toFacing, targetFacing);
+            Block blockToPlace = GetRailBlock(world, "curved_", toFacing, fromFacing);
 
             if (blockToPlace != null)
             {

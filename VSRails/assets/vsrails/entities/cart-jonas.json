@@ -7,7 +7,7 @@
   "deadHitboxSize": { "x": 1.0, "y": 0.5 },
   "attributes": {
     "isMechanical": true,
-    "maxhealth": 10
+    "maxhealth": 4
   },
   "drops": [],
 
@@ -23,15 +23,14 @@
       "charred":     { "base": "game:block/wood/charred" }
     },
     "behaviors": [
-      { "code": "interpolateposition" },
-    ],
+      { "code": "interpolateposition" }
+    ]
   },
 
   "server": {
     "behaviors": [
       { "code": "controlledphysics", "stepHeight": 0.2 },
-      { "code": "health", "maxhealth": 10 },
-      { "code": "rideable" }
+      { "code": "health", "maxhealth": 10 }
     ]
   }
 }

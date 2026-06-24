@@ -8,5 +8,6 @@
     "block-rails-raised_ns": "Sloped Small Rail",
     "block-rails-raised_we": "Sloped Small Rail",
     "entity-cart-handcar": "Small Handcar",
-    "entity-cart-jonas": "Small Jonas Cart"
+    "entity-cart-jonas": "Small Jonas Cart",
+    "item-cartspawner-cart-jonas": "Small Jonas Cart"
 }

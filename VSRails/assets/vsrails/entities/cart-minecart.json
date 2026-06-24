@@ -1,6 +1,6 @@
-{
-  "code": "cart-jonas",
-  "class": "JonasCart",
+﻿{
+  "code": "cart-minecart",
+  "class": "MineCart",
   "tags": ["mechanical", "habitat-land", "damageable"],
   "weight": 130,
   "hitboxSize": { "x": 1.0, "y": 1.0 },
@@ -12,7 +12,7 @@
 
   "client": {
     "renderer": "Shape",
-    "shape": { "base": "vsrails:entity/jonas-cart" },
+    "shape": { "base": "vsrails:entity/Minecart" },
     "size": 1.1,
     "textures": {
       "quartzglass": { "base": "game:block/glass/quartzglass" },

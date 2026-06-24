@@ -8,11 +8,11 @@
 	"textureSizes": {
 	},
   "textures": {
-    "quartzglass": "block/glass/quartzglass",
-    "rustyglow": "block/machine/statictranslocator/rustyglow",
-    "rusty-iron": "block/metal/tarnished/rusty-iron",
-    "steel": "block/metal/tarnished/steel",
-    "charred": "block/wood/charred"
+    "quartzglass": "game:block/glass/quartzglass",
+    "rustyglow": "game:block/machine/statictranslocator/rustyglow",
+    "rusty-iron": "game:block/metal/tarnished/rusty-iron",
+    "steel": "game:block/metal/tarnished/steel",
+    "charred": "game:block/wood/charred"
   },
   "elements": [
     {

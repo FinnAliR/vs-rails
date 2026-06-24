@@ -40,6 +40,9 @@ public class JonasCart : EntityAgent, IMountable
     private const double RailTop     = 0.0625;     // rail surface sits 1/16 above the block
     private const double DerailDrag  = 0.96;       // our own horizontal friction once off the rails
     private static readonly float YawModelOffset = 0f;  // nudge by ±PI/2 or PI if the model's front isn't -Z
+    private static readonly float SlopePitch     = GameMath.PIHALF / 2f;  // 45°: slope rails rise 1 block per block
+    private static readonly float PitchSign      = 1f;  // flip to -1 if the cart tilts the wrong way on slopes
+    private static readonly float RollSign       = 1f;  // flip to -1 if east/west slopes tilt the wrong way
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     public override void Initialize(EntityProperties properties, ICoreAPI api, long inChunkIndex3d)
@@ -190,6 +193,22 @@ public class JonasCart : EntityAgent, IMountable
         //    across the block so the cart meets the flat rail waiting at the higher level.
         Pos.Y = pos.Y + RailTop + SlopeFraction(pos, type);
 
+        // Tilt the cart to lie along the rail. Slope rails climb 1:1 (45°), and the shape renderer
+        // applies Pitch/Roll about world axes, so the two slope orientations behave differently:
+        //  - North/south slopes use Pitch, which the renderer already flips with travel direction, so a
+        //    FIXED tilt taken from the ascending axis reads correctly going both ways.
+        //  - East/west slopes use Roll, which the renderer does NOT flip with travel — so here we tilt
+        //    by the actual climb direction (sign of _vx toward the high end): nose up uphill, nose down
+        //    downhill. (A fixed roll was correct heading west but inverted heading east.)
+        float pitch = 0f, roll = 0f;
+        if (ascending)
+        {
+            if (ascZ != 0) pitch = -Math.Sign(ascZ)       * SlopePitch * PitchSign;
+            else           roll  =  Math.Sign(_vx * ascX) * SlopePitch * RollSign;
+        }
+        Pos.Pitch = pitch;
+        Pos.Roll  = roll;
+
         // We drove Pos ourselves; zero the engine motion so controlledphysics doesn't move us again.
         Pos.Motion.Set(0, 0, 0);
     }
@@ -269,12 +288,21 @@ public class JonasCart : EntityAgent, IMountable
         base.OnInteract(byEntity, slot, hitPosition, mode);
     }
 
+    /// <summary>Rebuilds the seat from the attributes written by CartSeat.MountableToTreeAttributes.
+    /// Registered via api.RegisterMountable("JonasCart", …) in VSRails.Start so the engine can restore
+    /// the mount on world load and during mounted-state syncs.</summary>
+    public static IMountableSeat GetMountable(IWorldAccessor world, TreeAttribute tree)
+    {
+        return world.GetEntityById(tree.GetLong("entityIdMount")) is JonasCart cart ? cart._seats[0] : null;
+    }
+
     // ── Seat ─────────────────────────────────────────────────────────────────
     private sealed class CartSeat : IMountableSeat
     {
         private readonly JonasCart _cart;
         private readonly Matrixf         _identity = new Matrixf();
         private readonly EntityPos       _seatPos  = new EntityPos();
+        private readonly EntityControls  _controls = new EntityControls();
 
         public CartSeat(JonasCart cart) => _cart = cart;
 
@@ -306,7 +334,7 @@ public class JonasCart : EntityAgent, IMountable
         public EnumMountAngleMode AngleMode               => EnumMountAngleMode.Fixate;
         public AnimationMetaData  SuggestedAnimation      => null;
         public Matrixf            RenderTransform         => _identity;
-        public EntityControls     Controls               => (_cart._seats[0].Passenger as EntityAgent)?.Controls;
+        public EntityControls     Controls               => _controls;  // must be non-null: engine calls Controls.FromInt() during TryMount, before Passenger is assigned
 
         public bool CanMount(EntityAgent entity)  => Passenger == null && entity is EntityPlayer;
         public bool CanUnmount(EntityAgent entity) => Passenger == entity;
@@ -316,6 +344,12 @@ public class JonasCart : EntityAgent, IMountable
 
         public void MountableToTreeAttributes(TreeAttribute tree)
         {
+            // The engine reconstructs the mount from these (see JonasCart.GetMountable, registered in
+            // VSRails.Start). "className" MUST be written — otherwise ClassRegistry.GetMountable does a
+            // dictionary lookup on a null key and throws while syncing the mounted state.
+            tree.SetString("className", "JonasCart");
+            tree.SetLong("entityIdMount", _cart.EntityId);
+            tree.SetString("seatId", SeatId);
             if (Passenger != null)
                 tree.SetLong("passengerEntityId", Passenger.EntityId);
         }

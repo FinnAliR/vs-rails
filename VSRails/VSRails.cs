@@ -13,6 +13,7 @@ namespace VSRails
         {
             api.RegisterBlockClass("BlockRail", typeof(BlockRail));
             api.RegisterEntity("JonasCart", typeof(JonasCart));
+            api.RegisterMountable("JonasCart", JonasCart.GetMountable);
         }
 
         public override void StartServerSide(ICoreServerAPI api) { }

@@ -7,7 +7,7 @@
   "variantgroups": [
     { "code": "type", "states": ["cart-jonas"] }
   ],
-  "maxstacksize": 8,
+  "maxstacksize": 1,
   "shape": { "base": "vsrails:entity/jonas-cart" },
   "textures": {
     "quartzglass": { "base": "game:block/glass/quartzglass" },

@@ -38,6 +38,8 @@ public class JonasCart : EntityAgent, IMountable
     private const double DragRidden  = 0.997;      // applyDrag(), with passenger
     private const double PushAccel   = 0.04;       // per-tick push from a rider holding "forward"
     private const double RailTop     = 0.0625;     // rail surface sits 1/16 above the block
+    private const double DerailDrag  = 0.96;       // our own horizontal friction once off the rails
+    private static readonly float YawModelOffset = 0f;  // nudge by ±PI/2 or PI if the model's front isn't -Z
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     public override void Initialize(EntityProperties properties, ICoreAPI api, long inChunkIndex3d)
@@ -73,21 +75,47 @@ public class JonasCart : EntityAgent, IMountable
         BlockPos railPos = IsRailAt(below) ? below : feet;
         string type = RailType(railPos);
 
+        // Convert our rail velocity (blocks per Minecraft tick, 1/20 s) to Vintage Story's Pos.Motion
+        // (blocks per 1/60 s): real speed _vx*20 blocks/s == _vx*20/60 in motion units. The original
+        // code used _vx*20 (60x too fast), which launched the cart off the end of the track.
+        const double McTickToMotion = 20.0 / 60.0;
+
         if (type == null)
         {
-            // Off the rails (moveDerailedMinecart): hand momentum back to the engine physics so it
-            // applies gravity, terrain collision and air drag, and stay in sync for when we re-rail.
-            Pos.Motion.X = _vx * 20.0;
-            Pos.Motion.Z = _vz * 20.0;
-            _vx = Pos.Motion.X / 20.0;
-            _vz = Pos.Motion.Z / 20.0;
+            // Off the rails (moveDerailedMinecart): keep feeding our HORIZONTAL momentum to the engine
+            // every tick, applying our own (gentle) drag so the cart still slows to a stop, and leave
+            // the VERTICAL motion to the engine's gravity so the cart arcs off ledges and falls.
+            //
+            // Re-asserting Motion.X/Z each tick (instead of handing off once and reading it back) is
+            // deliberate: the engine's ground friction is very strong, so while the cart rests on the
+            // lip of a block it scrubs the horizontal speed to zero before the cart can clear the edge
+            // — the cart just stops dead on the block instead of rolling off. Overriding Motion.X/Z
+            // bypasses that ground friction; DerailDrag supplies the (gentler) slowdown instead. We do
+            // NOT touch Motion.Y, so the engine still applies gravity and landing collisions normally.
+            double drag = Math.Pow(DerailDrag, dtFac);
+            _vx *= drag;
+            _vz *= drag;
+            Pos.Motion.X = _vx * McTickToMotion;
+            Pos.Motion.Z = _vz * McTickToMotion;
+            FaceTravel();
             return;
         }
 
         MoveAlongTrack(railPos, type, dtFac);
+        FaceTravel();
 
         WatchedAttributes.SetDouble("railVelX", _vx);
         WatchedAttributes.SetDouble("railVelZ", _vz);
+    }
+
+    /// <summary>Turn the cart to point the way it is travelling. In Vintage Story yaw 0 faces north
+    /// (-Z) and the "ahead" vector is (-sin yaw, -cos yaw), so the heading matching our horizontal
+    /// velocity (_vx,_vz) is atan2(-_vx,-_vz). Below a tiny speed we leave the yaw alone, so a stopped
+    /// cart keeps its facing instead of spinning on rounding noise.</summary>
+    private void FaceTravel()
+    {
+        if (_vx * _vx + _vz * _vz < 1e-6) return;
+        Pos.Yaw = (float)Math.Atan2(-_vx, -_vz) + YawModelOffset;
     }
 
     private void MoveAlongTrack(BlockPos pos, string type, double dtFac)

@@ -29,8 +29,7 @@
 
   "server": {
     "behaviors": [
-      { "code": "controlledphysics", "stepHeight": 0.2 },
-      { "code": "health", "maxhealth": 10 }
+      { "code": "controlledphysics", "stepHeight": 0.2 }
     ]
   }
 }

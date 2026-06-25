@@ -18,21 +18,20 @@ public class EntityRailCart : EntityAgent
     // (authored for Minecraft's 20 Hz) rescaled to our rate: velocities *(20/Tps), accel *(20/Tps)^2,
     // per-tick drag ^(20/Tps). Velocity (_vx/_vz) is blocks per VS tick.
     protected const          double Tps     = 30.0;
-    private  static readonly double McToTps = 20.0 / Tps;
 
     protected double _vx;   // along-track velocity, X (blocks per VS tick)
     protected double _vz;   // along-track velocity, Z (blocks per VS tick)
 
-    private  static readonly double MaxSpeed    = 0.4       * McToTps;
-    private  const           double RiddenScale = 0.75;
-    private  static readonly double SlopeAccel  = 0.0078125 * McToTps * McToTps;
-    private  static readonly double DragEmpty   = Math.Pow(0.96,  McToTps);
-    private  static readonly double DragRidden  = Math.Pow(0.997, McToTps);
-    protected static readonly double PushAccel  = 0.04      * McToTps * McToTps;
-    private  const           double RailTop     = 0.0625;
-    private  static readonly double DerailDrag  = Math.Pow(0.96,  McToTps);
-    private  static readonly double SpeedCap    = 2.0       * McToTps;
-    protected static readonly double MountKick  = 0.1       * McToTps;
+    private static readonly double MaxSpeed = 0.2666666666666667; // Range: 0+ // Higher = faster cart top speed // Current ≈ 4 blocks/sec
+    private const double RiddenScale = 0.75; // Range: 0-1 / Multiplier applied to MaxSpeed while ridden
+    private static readonly double SlopeAccel = 0.003472222222222222; // Range: 0+ // Gravity acceleration applied along slopes // Higher = harder to climb, faster downhill acceleration
+    private static readonly double DragEmpty = 0.973146191297; // Range: 0-1 // Velocity multiplier per tick when empty // 1 = no drag
+    private static readonly double DragRidden = 0.988999665998; // Range: 0-1 // Velocity multiplier per tick when ridden // 1 = no drag
+    protected static readonly double PushAccel = 0.017777777777777778; // Range: 0+ // Rider forward acceleration per tick
+    private const double RailTop = 0.0625; // Range: usually 0-1 // Visual/physical offset above rail block
+    private static readonly double DerailDrag = 0.973146191297; // Range: 0-1 // Velocity multiplier while off rails // 1 = no drag
+    private static readonly double SpeedCap = 1.3333333333333333; // Range: > MaxSpeed // Absolute emergency velocity clamp
+    protected static readonly double MountKick = 0.0; // Range: 0+ // Initial velocity when mounting
     private  static readonly float  SlopePitch  = GameMath.PIHALF / 2f;  // 45deg: slope rails rise 1 block per block
     private  static readonly float  PitchSign   = 1f;  // flip to -1 if the cart tilts the wrong way on N/S slopes
     private  static readonly float  RollSign    = 1f;  // flip to -1 if E/W slopes tilt the wrong way

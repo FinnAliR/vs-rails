@@ -1,22 +1,22 @@
 {
-  "ingredientPattern": "B_B,_R_,G_G",
+  "ingredientPattern": "P_P,GRG",
   "ingredients": {
-    "B": {
+    "P": {
       "type": "item",
-      "code": "game:metalplate-tinbronze"
-    },
-    "R": {
-      "type": "item",
-      "code": "game:metalrod-copper"
+      "code": "game:metalplate-*"
     },
     "G": {
       "type": "item",
       "code": "game:gear-rusty",
       "quantity": 2
+    },
+    "R": {
+      "type": "item",
+      "code": "game:metalrod-*"
     }
   },
   "width": 3,
-  "height": 3,
+  "height": 2,
   "output": {
     "type": "item",
     "code": "cartspawner-cart-minecart",

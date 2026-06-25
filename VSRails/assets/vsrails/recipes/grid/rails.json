@@ -1,13 +1,17 @@
 {
-  "ingredientPattern": "R_R,BBB",
+  "ingredientPattern": "RNR,BBB",
   "ingredients": {
     "R": {
       "type": "item",
-      "code": "game:metalrod-tinbronze"
+      "code": "game:metalrod-*"
+    },
+    "N": {
+      "type": "item",
+      "code": "game:nailsandstrips-*"
     },
     "B": {
       "type": "item",
-      "code": "game:plank-oak"
+      "code": "game:plank-*"
     }
   },
   "width": 3,

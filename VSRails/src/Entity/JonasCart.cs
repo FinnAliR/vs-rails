@@ -78,33 +78,51 @@ public class JonasCart : EntityAgent, IMountable
         if (Api.Side == EnumAppSide.Server)
             TickRail(dt);
         else if (IsControlledByOwnClient())
-            PredictClient(dt);   // the rider doesn't receive its own mount's position, so estimate it locally
+            PredictClient(dt);   // the rider isn't sent its own mount's UDP position, so follow the published one
     }
 
     private bool IsControlledByOwnClient()
         => Api is ICoreClientAPI capi && _seats[0].Passenger != null && _seats[0].Passenger == capi.World?.Player?.Entity;
 
-    /// <summary>The engine doesn't stream our own mount's POSITION to its rider, but it does sync the
-    /// VELOCITY (a WatchedAttribute). So while we control the cart, estimate its position locally from
-    /// that server velocity along the fixed rail. Being rail-constrained, this tracks the server closely
-    /// instead of free-guessing, and we keep ServerPos aligned so interpolateposition doesn't fight it.</summary>
     private void PredictClient(float dt)
     {
-        _vx = WatchedAttributes.GetDouble("railVelX", 0);
-        _vz = WatchedAttributes.GetDouble("railVelZ", 0);
+        // The engine withholds our own mount's UDP position from us, but the server publishes its
+        // authoritative position on WatchedAttributes (TCP, not withheld). Ease toward that real
+        // position — interpolated, not guessed — so there's no divergence, even falling off a ledge.
+        if (!WatchedAttributes.HasAttribute("railPosX")) return;
 
-        double dtFac = GameMath.Clamp(dt * 20.0, 0, 2.0);
-        BlockPos feet  = Pos.AsBlockPos;
-        BlockPos below = feet.DownCopy();
-        BlockPos railPos = IsRailAt(below) ? below : feet;
-        string type = RailType(railPos);
+        double tx = WatchedAttributes.GetDouble("railPosX");
+        double ty = WatchedAttributes.GetDouble("railPosY");
+        double tz = WatchedAttributes.GetDouble("railPosZ");
+        float  tyaw   = WatchedAttributes.GetFloat("railYaw");
+        float  tpitch = WatchedAttributes.GetFloat("railPitch");
+        float  troll  = WatchedAttributes.GetFloat("railRoll");
 
-        if (type != null) MoveAlongTrack(railPos, type, dtFac);
-        else { Pos.X += _vx * dtFac; Pos.Z += _vz * dtFac; }
-        FaceTravel();
+        float f = GameMath.Clamp(dt * 12f, 0f, 1f);
+        Pos.X += (tx - Pos.X) * f;
+        Pos.Y += (ty - Pos.Y) * f;
+        Pos.Z += (tz - Pos.Z) * f;
+        Pos.Yaw   += GameMath.AngleRadDistance(Pos.Yaw, tyaw) * f;
+        Pos.Pitch += (tpitch - Pos.Pitch) * f;
+        Pos.Roll  += (troll  - Pos.Roll)  * f;
 
+        // keep our local ServerPos aligned so interpolateposition doesn't fight the smoothing
         ServerPos.X = Pos.X; ServerPos.Y = Pos.Y; ServerPos.Z = Pos.Z;
         ServerPos.Yaw = Pos.Yaw; ServerPos.Pitch = Pos.Pitch; ServerPos.Roll = Pos.Roll;
+    }
+
+    /// <summary>Publish the server's authoritative position+velocity on WatchedAttributes so the
+    /// controlling client (which the engine refuses to send mount positions to) can follow it.</summary>
+    private void WriteNetState()
+    {
+        WatchedAttributes.SetDouble("railVelX", _vx);
+        WatchedAttributes.SetDouble("railVelZ", _vz);
+        WatchedAttributes.SetDouble("railPosX", Pos.X);
+        WatchedAttributes.SetDouble("railPosY", Pos.Y);
+        WatchedAttributes.SetDouble("railPosZ", Pos.Z);
+        WatchedAttributes.SetFloat("railYaw", Pos.Yaw);
+        WatchedAttributes.SetFloat("railPitch", Pos.Pitch);
+        WatchedAttributes.SetFloat("railRoll", Pos.Roll);
     }
 
     // Play the recoil animation when the cart is hurt (server starts it; it syncs to clients).
@@ -115,7 +133,7 @@ public class JonasCart : EntityAgent, IMountable
         return received;
     }
 
-    // ── Rail logic (ported from EntityMinecart.onUpdate + moveAlongTrack) ───────
+    // ── Rail logic ───────
     private void TickRail(float dt)
     {
         // Dismount on sneak (Shift); we implement IMountable directly, so nothing else triggers it.
@@ -163,6 +181,7 @@ public class JonasCart : EntityAgent, IMountable
             Pos.Motion.Z = _vz * McTickToMotion;
             FaceTravel();
             UpdateMoveAnim();
+            WriteNetState();
             return;
         }
 
@@ -171,8 +190,7 @@ public class JonasCart : EntityAgent, IMountable
         UpdateMoveAnim();
         UpdateTurnAnim(dt);
 
-        WatchedAttributes.SetDouble("railVelX", _vx);
-        WatchedAttributes.SetDouble("railVelZ", _vz);
+        WriteNetState();
     }
 
     /// <summary>Turn the cart to point the way it is travelling. In Vintage Story yaw 0 faces north

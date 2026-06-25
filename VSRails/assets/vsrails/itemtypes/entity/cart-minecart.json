@@ -10,12 +10,12 @@
   "maxstacksize": 1,
   "shape": { "base": "vsrails:entity/cart-minecart" },
   "textures": {
-    "metal":       { "base": "game:block/metal/tarnished/rusty-iron" },
-    "quartzglass": { "base": "game:block/glass/quartzglass" },
-    "steel":       { "base": "game:block/metal/tarnished/steel" },
+    "metal":       { "base": "game:block/metal/corroded/rusty1" },
+    "quartzglass": { "base": "game:block/glass/quartz" },
+    "steel":       { "base": "game:block/metal/armor-generic/steel" },
     "charredwood": { "base": "game:block/wood/charred" },
-    "texture1":    { "base": "game:block/metal/tarnished/rusty-iron" },
-    "texture2":    { "base": "game:block/metal/tarnished/steel" }
+    "texture1":    { "base": "game:item/bag/miningbag/linen" },
+    "texture2":    { "base": "game:item/bag/miningbag/top" }
   },
   "guiTransform": {
     "translation": { x: 1, y: 4, z: 0 },

@@ -26,20 +26,27 @@ public class JonasCart : EntityAgent, IMountable
     public EntityControls    ControllingControls  => _seats[0].Controls;  // seat carries the live rider input while mounted (the player's own Controls go stale)
 
     // ── Rail state ────────────────────────────────────────────────────────────
-    // Velocity is kept in Minecraft's units: blocks per 20 Hz tick (matching the constants below,
-    // lifted straight from EntityMinecart). Real movement is dt-corrected via dtFac = dt * 20.
-    private double _vx;   // along-track velocity, X (blocks/tick)
-    private double _vz;   // along-track velocity, Z (blocks/tick)
+    // The simulation runs at Vintage Story's physics rate (Tps = 30). The constants below are
+    // EntityMinecart's, authored for Minecraft's 20 Hz, rescaled to our rate so the cart behaves the
+    // same while the clock matches the engine: velocities ×(20/Tps), accelerations ×(20/Tps)²,
+    // per-tick drag ^(20/Tps). Velocity (_vx/_vz) is therefore blocks per VS tick.
+    private const          double Tps    = 30.0;          // Vintage Story physics ticks per second
+    private static readonly double McToTps = 20.0 / Tps;  // Minecraft (20 Hz) ticks per VS tick
 
-    private const double MaxSpeed    = 0.4;        // EntityMinecart.getMaximumSpeed()
-    private const double RiddenScale = 0.75;       // moveAlongTrack reduces speed while ridden
-    private const double SlopeAccel  = 0.0078125;  // 1/128, gravity pull along an ascending rail
-    private const double DragEmpty   = 0.96;       // applyDrag(), no passenger
-    private const double DragRidden  = 0.997;      // applyDrag(), with passenger
-    private const double PushAccel   = 0.04;       // per-tick push from a rider holding "forward"
-    private const double RailTop     = 0.0625;     // rail surface sits 1/16 above the block
-    private const double DerailDrag  = 0.96;       // our own horizontal friction once off the rails
-    private static readonly float YawModelOffset = 0f;  // nudge by ±PI/2 or PI if the model's front isn't -Z
+    private double _vx;   // along-track velocity, X (blocks per VS tick)
+    private double _vz;   // along-track velocity, Z (blocks per VS tick)
+
+    private static readonly double MaxSpeed   = 0.4       * McToTps;            // EntityMinecart.getMaximumSpeed()
+    private const           double RiddenScale = 0.75;                          // moveAlongTrack reduces speed while ridden
+    private static readonly double SlopeAccel = 0.0078125 * McToTps * McToTps;  // 1/128, gravity pull on an ascending rail
+    private static readonly double DragEmpty  = Math.Pow(0.96,  McToTps);       // applyDrag(), no passenger
+    private static readonly double DragRidden = Math.Pow(0.997, McToTps);       // applyDrag(), with passenger
+    private static readonly double PushAccel  = 0.04      * McToTps * McToTps;  // per-tick push from a rider holding "forward"
+    private const           double RailTop    = 0.0625;                         // rail surface sits 1/16 above the block
+    private static readonly double DerailDrag = Math.Pow(0.96,  McToTps);       // our own horizontal friction once off the rails
+    private static readonly double SpeedCap   = 2.0       * McToTps;            // hard projection clamp in moveAlongTrack
+    private static readonly double MountKick  = 0.1       * McToTps;            // kick on mount so the cart starts rolling
+    private static readonly float YawModelOffset = GameMath.PIHALF;  // model faces +X (east) at yaw 0 -> rotate +90° to point along travel
     private static readonly float SlopePitch     = GameMath.PIHALF / 2f;  // 45°: slope rails rise 1 block per block
     private static readonly float PitchSign      = 1f;  // flip to -1 if the cart tilts the wrong way on slopes
     private static readonly float RollSign       = 1f;  // flip to -1 if east/west slopes tilt the wrong way
@@ -148,7 +155,7 @@ public class JonasCart : EntityAgent, IMountable
 
         // dtFac = how many 20 Hz Minecraft ticks elapsed this frame. Clamp so a lag spike can't
         // fling the cart through a wall.
-        double dtFac = GameMath.Clamp(dt * 20.0, 0, 2.0);
+        double dtFac = GameMath.Clamp(dt, 0.0, 0.1) * Tps;   // VS ticks elapsed (0.1 s anti-tunnel clamp)
 
         // Like moveAlongTrack: the rail we ride may be at our feet or one block below (top of a
         // slope), and a rail directly below takes priority.
@@ -160,7 +167,7 @@ public class JonasCart : EntityAgent, IMountable
         // Convert our rail velocity (blocks per Minecraft tick, 1/20 s) to Vintage Story's Pos.Motion
         // (blocks per 1/60 s): real speed _vx*20 blocks/s == _vx*20/60 in motion units. The original
         // code used _vx*20 (60x too fast), which launched the cart off the end of the track.
-        const double McTickToMotion = 20.0 / 60.0;
+        const double McTickToMotion = Tps / 60.0;
 
         if (type == null)
         {
@@ -243,7 +250,7 @@ public class JonasCart : EntityAgent, IMountable
         if (_vx * rvx + _vz * rvz < 0) { rvx = -rvx; rvz = -rvz; }   // travel-direction sign
 
         double speed = Math.Sqrt(_vx * _vx + _vz * _vz);
-        if (speed > 2.0) speed = 2.0;
+        if (speed > SpeedCap) speed = SpeedCap;
         _vx = speed * rvx / rlen;
         _vz = speed * rvz / rlen;
 
@@ -383,8 +390,8 @@ public class JonasCart : EntityAgent, IMountable
                 var facing = BlockFacing.FromVector(look.X, 0, look.Z);
                 if (facing != null && facing.Axis != EnumAxis.Y)
                 {
-                    _vx = facing.Normali.X * 0.1;
-                    _vz = facing.Normali.Z * 0.1;
+                    _vx = facing.Normali.X * MountKick;
+                    _vz = facing.Normali.Z * MountKick;
                 }
 
                 byEntity.TryMount(seat);

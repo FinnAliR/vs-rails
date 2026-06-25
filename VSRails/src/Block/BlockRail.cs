@@ -35,6 +35,32 @@ namespace VSRails
         private const string FlatNS = "flat_ns";
         private const string FlatWE = "flat_we";
 
+        // Right-clicking a rail with a wrench cycles it through the rail shapes, so players can force a
+        // specific shape (a corner or a slope) instead of relying on the auto-shaping at placement.
+        private static readonly string[] WrenchCycle =
+        {
+            "flat_ns", "flat_we",
+            "curved_ne", "curved_es", "curved_sw", "curved_wn",
+            "raised_n", "raised_e", "raised_s", "raised_w"
+        };
+
+        public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
+        {
+            ItemStack held = byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack;
+            if (held?.Collectible?.Code?.Path?.Contains("wrench") == true)
+            {
+                if (world.Side == EnumAppSide.Server)
+                {
+                    int idx = System.Array.IndexOf(WrenchCycle, Variant["type"]);
+                    string next = WrenchCycle[(idx + 1) % WrenchCycle.Length];   // idx -1 -> flat_ns; wraps round
+                    Block nb = ResolveRail(world, next);
+                    if (nb != null) world.BlockAccessor.ExchangeBlock(nb.Id, blockSel.Position);
+                }
+                return true;   // consume the interaction so the wrench does nothing else
+            }
+            return base.OnBlockInteractStart(world, byPlayer, blockSel);
+        }
+
         // ---------------------------------------------------------------------------------------
         // Placement  (mirrors BlockRailBase.onBlockAdded -> updateDir -> Rail.place)
         // ---------------------------------------------------------------------------------------

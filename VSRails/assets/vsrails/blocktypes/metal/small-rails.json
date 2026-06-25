@@ -32,6 +32,9 @@
     "general": ["rails-flat_ns"]
   },
 
+  "drops": [{ "type": "block", "code": "rails-flat_ns", "quantity": { "avg": 1 } }],
+  "requiredMiningTier": 1,
+
   "shapeByType": {
     "*-curved_es": { "base": "vsrails:block/rail/rail-curve", "rotateY": 0 },
     "*-curved_sw": { "base": "vsrails:block/rail/rail-curve", "rotateY": 270 },

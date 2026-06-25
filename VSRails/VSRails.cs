@@ -14,7 +14,7 @@ namespace VSRails
             api.RegisterBlockClass("BlockRail", typeof(BlockRail));
             api.RegisterEntity("Minecart", typeof(EntityMinecart));
             api.RegisterEntity("SmartCart", typeof(EntitySmartCart));
-            api.RegisterMountable("railcart", EntityRailCart.GetMountable);
+            api.RegisterMountable("railcart", EntityMinecart.GetMountable);
         }
 
         public override void StartServerSide(ICoreServerAPI api) { }

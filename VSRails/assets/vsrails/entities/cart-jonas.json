@@ -1,6 +1,6 @@
 {
   "code": "cart-jonas",
-  "class": "JonasCart",
+  "class": "SmartCart",
   "tags": ["vehicle",  "inanimate"],
   "weight": 130,
   "hitboxSize": { "x": 0.5, "y": 0.5 },

@@ -7,11 +7,12 @@ using Vintagestory.API.Datastructures;
 namespace VSRails;
 
 /// <summary>
-/// The Jonas cart. Finds any block with "rail" in its code underfoot,
-/// snaps to the rail axis, and self-propels when a player is riding.
-/// Right-click to mount; travel direction is set from the player's look.
+/// Base rail cart: finds any block with "rail" in its code underfoot, snaps to the rail axis, follows
+/// the track, self-propels when ridden, derails off the ends, and handles the client/server netcode.
+/// EntityMinecart and EntitySmartCart inherit this; the entity JSON's "class" selects which spawns.
+/// Right-click to mount, Shift to dismount.
 /// </summary>
-public class JonasCart : EntityAgent, IMountable
+public class EntityRailCart : EntityAgent, IMountable
 {
     // ── IMountable ────────────────────────────────────────────────────────────
     private IMountableSeat[] _seats;
@@ -46,7 +47,6 @@ public class JonasCart : EntityAgent, IMountable
     private static readonly double DerailDrag = Math.Pow(0.96,  McToTps);       // our own horizontal friction once off the rails
     private static readonly double SpeedCap   = 2.0       * McToTps;            // hard projection clamp in moveAlongTrack
     private static readonly double MountKick  = 0.1       * McToTps;            // kick on mount so the cart starts rolling
-    private static readonly float YawModelOffset = GameMath.PIHALF;  // model faces +X (east) at yaw 0 -> rotate +90° to point along travel
     private static readonly float SlopePitch     = GameMath.PIHALF / 2f;  // 45°: slope rails rise 1 block per block
     private static readonly float PitchSign      = 1f;  // flip to -1 if the cart tilts the wrong way on slopes
     private static readonly float RollSign       = 1f;  // flip to -1 if east/west slopes tilt the wrong way
@@ -64,6 +64,7 @@ public class JonasCart : EntityAgent, IMountable
     private bool   _movingAnimOn;
     private float  _prevYaw;
     private double _turnCooldown;
+    private bool   _clientSimming;   // controller-client: currently running the local on-rail sim?
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     public override void Initialize(EntityProperties properties, ICoreAPI api, long inChunkIndex3d)
@@ -85,35 +86,57 @@ public class JonasCart : EntityAgent, IMountable
         if (Api.Side == EnumAppSide.Server)
             TickRail(dt);
         else if (IsControlledByOwnClient())
-            PredictClient(dt);   // the rider isn't sent its own mount's UDP position, so follow the published one
+            ClientTick(dt);   // the rider isn't sent its own mount's UDP position, so simulate it locally
     }
 
     private bool IsControlledByOwnClient()
         => Api is ICoreClientAPI capi && _seats[0].Passenger != null && _seats[0].Passenger == capi.World?.Player?.Entity;
 
-    private void PredictClient(float dt)
+    /// <summary>Boat-style local simulation for the controlling client (the engine won't stream our own
+    /// mount's position to us). On a rail we run the same rail sim the server does, seeded once from the
+    /// server's velocity then owned locally — smooth every tick, no stutter from sparse position syncs —
+    /// with a gentle pull toward the published position to bound drift. Off a rail (falling) we follow the
+    /// server's authoritative position, which has the real gravity/collision, so we can't slide off sideways.</summary>
+    private void ClientTick(float dt)
     {
-        // The engine withholds our own mount's UDP position from us, but the server publishes its
-        // authoritative position on WatchedAttributes (TCP, not withheld). Ease toward that real
-        // position — interpolated, not guessed — so there's no divergence, even falling off a ledge.
-        if (!WatchedAttributes.HasAttribute("railPosX")) return;
+        BlockPos feet  = Pos.AsBlockPos;
+        BlockPos below = feet.DownCopy();
+        BlockPos railPos = IsRailAt(below) ? below : feet;
+        string type = RailType(railPos);
+        bool haveServer = WatchedAttributes.HasAttribute("railPosX");
 
-        double tx = WatchedAttributes.GetDouble("railPosX");
-        double ty = WatchedAttributes.GetDouble("railPosY");
-        double tz = WatchedAttributes.GetDouble("railPosZ");
-        float  tyaw   = WatchedAttributes.GetFloat("railYaw");
-        float  tpitch = WatchedAttributes.GetFloat("railPitch");
-        float  troll  = WatchedAttributes.GetFloat("railRoll");
+        if (type != null)
+        {
+            if (!_clientSimming)   // (re)take the local sim: seed velocity from the server
+            {
+                _vx = WatchedAttributes.GetDouble("railVelX", _vx);
+                _vz = WatchedAttributes.GetDouble("railVelZ", _vz);
+                _clientSimming = true;
+            }
+            MoveAlongTrack(railPos, type, GameMath.Clamp(dt, 0.0, 0.1) * Tps);
+            FaceTravel();
+            if (haveServer)   // gentle drift correction toward the authoritative position
+            {
+                float cf = GameMath.Clamp(dt * 3f, 0f, 1f);
+                Pos.X += (WatchedAttributes.GetDouble("railPosX") - Pos.X) * cf;
+                Pos.Y += (WatchedAttributes.GetDouble("railPosY") - Pos.Y) * cf;
+                Pos.Z += (WatchedAttributes.GetDouble("railPosZ") - Pos.Z) * cf;
+            }
+        }
+        else
+        {
+            _clientSimming = false;
+            if (haveServer)   // off rail: follow the server (it owns the fall's gravity + collision)
+            {
+                float f = GameMath.Clamp(dt * 12f, 0f, 1f);
+                Pos.X += (WatchedAttributes.GetDouble("railPosX") - Pos.X) * f;
+                Pos.Y += (WatchedAttributes.GetDouble("railPosY") - Pos.Y) * f;
+                Pos.Z += (WatchedAttributes.GetDouble("railPosZ") - Pos.Z) * f;
+                Pos.Yaw += GameMath.AngleRadDistance(Pos.Yaw, WatchedAttributes.GetFloat("railYaw")) * f;
+            }
+        }
 
-        float f = GameMath.Clamp(dt * 12f, 0f, 1f);
-        Pos.X += (tx - Pos.X) * f;
-        Pos.Y += (ty - Pos.Y) * f;
-        Pos.Z += (tz - Pos.Z) * f;
-        Pos.Yaw   += GameMath.AngleRadDistance(Pos.Yaw, tyaw) * f;
-        Pos.Pitch += (tpitch - Pos.Pitch) * f;
-        Pos.Roll  += (troll  - Pos.Roll)  * f;
-
-        // keep our local ServerPos aligned so interpolateposition doesn't fight the smoothing
+        // keep our local ServerPos aligned so interpolateposition doesn't fight the local sim
         ServerPos.X = Pos.X; ServerPos.Y = Pos.Y; ServerPos.Z = Pos.Z;
         ServerPos.Yaw = Pos.Yaw; ServerPos.Pitch = Pos.Pitch; ServerPos.Roll = Pos.Roll;
     }
@@ -207,7 +230,7 @@ public class JonasCart : EntityAgent, IMountable
     private void FaceTravel()
     {
         if (_vx * _vx + _vz * _vz < 1e-6) return;
-        Pos.Yaw = (float)Math.Atan2(-_vx, -_vz) + YawModelOffset;
+        Pos.Yaw = (float)Math.Atan2(-_vx, -_vz);
     }
 
     /// <summary>Loop the wheel "moving" animation whenever the cart is rolling, stop it when at rest.</summary>
@@ -402,22 +425,22 @@ public class JonasCart : EntityAgent, IMountable
     }
 
     /// <summary>Rebuilds the seat from the attributes written by CartSeat.MountableToTreeAttributes.
-    /// Registered via api.RegisterMountable("JonasCart", …) in VSRails.Start so the engine can restore
+    /// Registered via api.RegisterMountable("EntityRailCart", …) in VSRails.Start so the engine can restore
     /// the mount on world load and during mounted-state syncs.</summary>
     public static IMountableSeat GetMountable(IWorldAccessor world, TreeAttribute tree)
     {
-        return world.GetEntityById(tree.GetLong("entityIdMount")) is JonasCart cart ? cart._seats[0] : null;
+        return world.GetEntityById(tree.GetLong("entityIdMount")) is EntityRailCart cart ? cart._seats[0] : null;
     }
 
     // ── Seat ─────────────────────────────────────────────────────────────────
     private sealed class CartSeat : IMountableSeat
     {
-        private readonly JonasCart _cart;
+        private readonly EntityRailCart _cart;
         private readonly Matrixf         _identity = new Matrixf();
         private readonly EntityPos       _seatPos  = new EntityPos();
         private readonly EntityControls  _controls = new EntityControls();
 
-        public CartSeat(JonasCart cart) => _cart = cart;
+        public CartSeat(EntityRailCart cart) => _cart = cart;
 
         public IMountable         MountSupplier          => _cart;
         public Entity             Entity                 => _cart;
@@ -464,10 +487,10 @@ public class JonasCart : EntityAgent, IMountable
 
         public void MountableToTreeAttributes(TreeAttribute tree)
         {
-            // The engine reconstructs the mount from these (see JonasCart.GetMountable, registered in
+            // The engine reconstructs the mount from these (see EntityRailCart.GetMountable, registered in
             // VSRails.Start). "className" MUST be written — otherwise ClassRegistry.GetMountable does a
             // dictionary lookup on a null key and throws while syncing the mounted state.
-            tree.SetString("className", "JonasCart");
+            tree.SetString("className", "railcart");
             tree.SetLong("entityIdMount", _cart.EntityId);
             tree.SetString("seatId", SeatId);
             if (Passenger != null)

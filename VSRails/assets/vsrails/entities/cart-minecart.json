@@ -1,6 +1,6 @@
 ﻿{
   "code": "cart-minecart",
-  "class": "JonasCart",
+  "class": "Minecart",
   "tags": ["vehicle", "inanimate"], 
   "weight": 130,
   "hitboxSize": { "x": 0.5, "y": 0.5 },

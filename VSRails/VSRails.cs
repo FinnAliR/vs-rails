@@ -13,7 +13,6 @@ namespace VSRails
         {
             api.RegisterBlockClass("BlockRail", typeof(BlockRail));
             api.RegisterEntity("Minecart", typeof(EntityMinecart));
-            api.RegisterEntity("SmartCart", typeof(EntitySmartCart));
             api.RegisterMountable("railcart", EntityMinecart.GetMountable);
         }
 

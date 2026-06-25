@@ -6,17 +6,10 @@ using Vintagestory.API.MathTools;
 namespace VSRails;
 
 /// <summary>
-/// Base rail cart - the shared tech both the minecart and the smart cart use. Finds any block with
-/// "rail" in its code underfoot, snaps to the rail axis, follows the track (curves + 1:1 slopes),
-/// derails off open ends, tilts to match the rail, plays the wheel/corner/hurt animations and publishes
-/// its state for clients. It is intentionally NOT mountable - seating + stowage live on EntityMinecart.
-/// A rider or AI drives it by setting velocity and overriding the rider hooks (IsRidden, ApplyRiderPush).
+/// Base rail cart
 /// </summary>
 public class EntityRailCart : EntityAgent
 {
-    // The sim runs at Vintage Story's physics rate (Tps = 30). Constants come from EntityMinecart
-    // (authored for Minecraft's 20 Hz) rescaled to our rate: velocities *(20/Tps), accel *(20/Tps)^2,
-    // per-tick drag ^(20/Tps). Velocity (_vx/_vz) is blocks per VS tick.
     protected const          double Tps     = 30.0;
 
     protected double _vx;   // along-track velocity, X (blocks per VS tick)
@@ -35,9 +28,6 @@ public class EntityRailCart : EntityAgent
     private  static readonly float  SlopePitch  = GameMath.PIHALF / 2f;  // 45deg: slope rails rise 1 block per block
     private  static readonly float  PitchSign   = 1f;  // flip to -1 if the cart tilts the wrong way on N/S slopes
     private  static readonly float  RollSign    = 1f;  // flip to -1 if E/W slopes tilt the wrong way
-
-    // Per-model facing fix (degrees) from the entity "yawOffsetDeg" attribute: the model's authored
-    // forward vs our travel yaw. The minecart model faces east, so its JSON sets 90.
     protected float YawOffset;
 
     private const string AnimMoving      = "moving";       // wheels turning while rolling (loops)
@@ -74,8 +64,7 @@ public class EntityRailCart : EntityAgent
         if (Api.Side == EnumAppSide.Server)
             TickRail(dt);
     }
-
-    // Play the recoil animation when hurt (server starts it; it syncs to clients).
+    
     public override bool ReceiveDamage(DamageSource damageSource, float damage)
     {
         bool received = base.ReceiveDamage(damageSource, damage);

@@ -193,7 +193,7 @@ public class EntityMinecart : EntityRailCart, IMountable
         public Matrixf            RenderTransform         => _identity;
         public EntityControls     Controls               => _controls;  // non-null: engine calls Controls.FromInt() during TryMount, before Passenger is set
 
-        public bool CanMount(EntityAgent entity)  => Passenger == null && entity is EntityPlayer;
+        public bool CanMount(EntityAgent entity)  => Passenger == null && entity is EntityAgent;  // players + similarly-sized creatures
         public bool CanUnmount(EntityAgent entity) => Passenger == entity;
 
         public void DidMount(EntityAgent entity)  { Passenger = entity; }

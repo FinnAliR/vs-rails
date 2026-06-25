@@ -1,14 +1,12 @@
 {
-    "block-rails-flat_ns": "Straight Small Rail",
-    "block-rails-flat_we": "Straight Small Rail",
-    "block-rails-curved_es": "Curved Small Rail",
-    "block-rails-curved_sw": "Curved Small Rail",
-    "block-rails-curved_wn": "Curved Small Rail",
-    "block-rails-curved_ne": "Curved Small Rail",
-    "block-rails-raised_ns": "Sloped Small Rail",
-    "block-rails-raised_we": "Sloped Small Rail",
-    "entity-cart-minecart": "Small Minecart",
-    "entity-cart-jonas": "Small Jonas Cart",
-    "item-cartspawner-cart-jonas": "Small Jonas Cart",
-    "item-cartspawner-cart-minecart": "Small Minecart"
+    "block-rails-flat_ns": "Straight Rail",
+    "block-rails-flat_we": "Straight Rail",
+    "block-rails-curved_es": "Curved Rail",
+    "block-rails-curved_sw": "Curved Rail",
+    "block-rails-curved_wn": "Curved Rail",
+    "block-rails-curved_ne": "Curved Rail",
+    "block-rails-raised_ns": "Sloped Rail",
+    "block-rails-raised_we": "Sloped Rail",
+    "entity-cart-minecart": "Minecart",
+    "item-cartspawner-cart-minecart": "Minecart"
 }

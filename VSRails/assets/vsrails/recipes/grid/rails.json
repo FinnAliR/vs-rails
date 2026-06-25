@@ -1,0 +1,20 @@
+{
+  "ingredientPattern": "R_R,BBB",
+  "ingredients": {
+    "R": {
+      "type": "item",
+      "code": "game:metalrod-tinbronze"
+    },
+    "B": {
+      "type": "item",
+      "code": "game:plank-oak"
+    }
+  },
+  "width": 3,
+  "height": 2,
+  "output": {
+    "type": "block",
+    "code": "rails-flat_ns",
+    "quantity": 32
+  }
+}

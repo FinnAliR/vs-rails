@@ -23,7 +23,7 @@ public class JonasCart : EntityAgent, IMountable
     public double            StepPitch            => 0;
     public bool              AnyMounted()         => _seats[0].Passenger != null;
     public Entity Controller => _seats[0].Passenger;
-    public EntityControls    ControllingControls  => (_seats[0].Passenger as EntityAgent)?.Controls;
+    public EntityControls    ControllingControls  => _seats[0].Controls;  // seat carries the live rider input while mounted (the player's own Controls go stale)
 
     // ── Rail state ────────────────────────────────────────────────────────────
     // Velocity is kept in Minecraft's units: blocks per 20 Hz tick (matching the constants below,
@@ -44,6 +44,20 @@ public class JonasCart : EntityAgent, IMountable
     private static readonly float PitchSign      = 1f;  // flip to -1 if the cart tilts the wrong way on slopes
     private static readonly float RollSign       = 1f;  // flip to -1 if east/west slopes tilt the wrong way
 
+    // ── Animation (codes resolve to entries in the entity's client.animations) ──
+    private const string AnimMoving      = "moving";       // wheels turning while rolling (loops)
+    private const string AnimPunch       = "punch";        // recoil when damaged
+    private const string AnimCornerRight = "cornerright";  // turning right through a curve
+    private const string AnimCornerLeft  = "cornerleft";   // turning left through a curve
+    private const double MoveAnimMinSpeed  = 0.01;         // blocks/MC-tick; above this the wheels spin
+    private const float  TurnAnimThreshold = 0.15f;        // yaw change (rad) per tick that counts as a turn
+    private const double TurnAnimCooldown  = 0.5;          // seconds before another corner anim may fire
+    private static readonly bool SwapTurnAnims = false;    // flip if the right/left corner anims come out reversed
+
+    private bool   _movingAnimOn;
+    private float  _prevYaw;
+    private double _turnCooldown;
+
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     public override void Initialize(EntityProperties properties, ICoreAPI api, long inChunkIndex3d)
     {
@@ -55,6 +69,7 @@ public class JonasCart : EntityAgent, IMountable
 
         _vx = WatchedAttributes.GetDouble("railVelX", 0);
         _vz = WatchedAttributes.GetDouble("railVelZ", 0);
+        _prevYaw = Pos.Yaw;
     }
 
     public override void OnGameTick(float dt)
@@ -62,11 +77,57 @@ public class JonasCart : EntityAgent, IMountable
         base.OnGameTick(dt);
         if (Api.Side == EnumAppSide.Server)
             TickRail(dt);
+        else if (IsControlledByOwnClient())
+            PredictClient(dt);   // the rider doesn't receive its own mount's position, so estimate it locally
+    }
+
+    private bool IsControlledByOwnClient()
+        => Api is ICoreClientAPI capi && _seats[0].Passenger != null && _seats[0].Passenger == capi.World?.Player?.Entity;
+
+    /// <summary>The engine doesn't stream our own mount's POSITION to its rider, but it does sync the
+    /// VELOCITY (a WatchedAttribute). So while we control the cart, estimate its position locally from
+    /// that server velocity along the fixed rail. Being rail-constrained, this tracks the server closely
+    /// instead of free-guessing, and we keep ServerPos aligned so interpolateposition doesn't fight it.</summary>
+    private void PredictClient(float dt)
+    {
+        _vx = WatchedAttributes.GetDouble("railVelX", 0);
+        _vz = WatchedAttributes.GetDouble("railVelZ", 0);
+
+        double dtFac = GameMath.Clamp(dt * 20.0, 0, 2.0);
+        BlockPos feet  = Pos.AsBlockPos;
+        BlockPos below = feet.DownCopy();
+        BlockPos railPos = IsRailAt(below) ? below : feet;
+        string type = RailType(railPos);
+
+        if (type != null) MoveAlongTrack(railPos, type, dtFac);
+        else { Pos.X += _vx * dtFac; Pos.Z += _vz * dtFac; }
+        FaceTravel();
+
+        ServerPos.X = Pos.X; ServerPos.Y = Pos.Y; ServerPos.Z = Pos.Z;
+        ServerPos.Yaw = Pos.Yaw; ServerPos.Pitch = Pos.Pitch; ServerPos.Roll = Pos.Roll;
+    }
+
+    // Play the recoil animation when the cart is hurt (server starts it; it syncs to clients).
+    public override bool ReceiveDamage(DamageSource damageSource, float damage)
+    {
+        bool received = base.ReceiveDamage(damageSource, damage);
+        if (received && Api.Side == EnumAppSide.Server) AnimManager?.StartAnimation(AnimPunch);
+        return received;
     }
 
     // ── Rail logic (ported from EntityMinecart.onUpdate + moveAlongTrack) ───────
     private void TickRail(float dt)
     {
+        // Dismount on sneak (Shift); we implement IMountable directly, so nothing else triggers it.
+        // The rider's live input lands in the seat's Controls while mounted, not the player's own.
+        // Zero our velocity so stepping off doesn't fling the now-empty cart away.
+        if (_seats[0].Passenger is EntityAgent rider && (_seats[0].Controls.Sneak || rider.Controls.Sneak))
+        {
+            rider.TryUnmount();
+            _vx = 0; _vz = 0;
+            Pos.Motion.Set(0, 0, 0);
+        }
+
         // dtFac = how many 20 Hz Minecraft ticks elapsed this frame. Clamp so a lag spike can't
         // fling the cart through a wall.
         double dtFac = GameMath.Clamp(dt * 20.0, 0, 2.0);
@@ -101,11 +162,14 @@ public class JonasCart : EntityAgent, IMountable
             Pos.Motion.X = _vx * McTickToMotion;
             Pos.Motion.Z = _vz * McTickToMotion;
             FaceTravel();
+            UpdateMoveAnim();
             return;
         }
 
         MoveAlongTrack(railPos, type, dtFac);
         FaceTravel();
+        UpdateMoveAnim();
+        UpdateTurnAnim(dt);
 
         WatchedAttributes.SetDouble("railVelX", _vx);
         WatchedAttributes.SetDouble("railVelZ", _vz);
@@ -119,6 +183,30 @@ public class JonasCart : EntityAgent, IMountable
     {
         if (_vx * _vx + _vz * _vz < 1e-6) return;
         Pos.Yaw = (float)Math.Atan2(-_vx, -_vz) + YawModelOffset;
+    }
+
+    /// <summary>Loop the wheel "moving" animation whenever the cart is rolling, stop it when at rest.</summary>
+    private void UpdateMoveAnim()
+    {
+        bool moving = _vx * _vx + _vz * _vz > MoveAnimMinSpeed * MoveAnimMinSpeed;
+        if (moving && !_movingAnimOn)       { AnimManager?.StartAnimation(AnimMoving); _movingAnimOn = true; }
+        else if (!moving && _movingAnimOn)  { AnimManager?.StopAnimation(AnimMoving);  _movingAnimOn = false; }
+    }
+
+    /// <summary>Fire a one-shot corner animation when our heading swings (entering/leaving a curve).
+    /// dYaw sign chooses right vs left; flip SwapTurnAnims if they come out reversed in game.</summary>
+    private void UpdateTurnAnim(float dt)
+    {
+        if (_turnCooldown > 0) _turnCooldown -= dt;
+        float dYaw = GameMath.AngleRadDistance(_prevYaw, Pos.Yaw);
+        _prevYaw = Pos.Yaw;
+        if (_turnCooldown <= 0 && Math.Abs(dYaw) > TurnAnimThreshold)
+        {
+            bool right = dYaw < 0;
+            if (SwapTurnAnims) right = !right;
+            AnimManager?.StartAnimation(right ? AnimCornerRight : AnimCornerLeft);
+            _turnCooldown = TurnAnimCooldown;
+        }
     }
 
     private void MoveAlongTrack(BlockPos pos, string type, double dtFac)
@@ -331,8 +419,15 @@ public class JonasCart : EntityAgent, IMountable
         public bool               CanControl             => true;
         public bool               DoTeleportOnUnmount    { get; set; } = false;
         public bool               SkipIdleAnimation      => false;
-        public EnumMountAngleMode AngleMode               => EnumMountAngleMode.Fixate;
-        public AnimationMetaData  SuggestedAnimation      => null;
+        public EnumMountAngleMode AngleMode               => EnumMountAngleMode.Unaffected;  // free look while riding; Fixate locks the rider's camera to the cart
+        private AnimationMetaData _sitAnim;
+        public AnimationMetaData  SuggestedAnimation      => _sitAnim ??= MakeSitAnim();
+        private AnimationMetaData MakeSitAnim()
+        {
+            string code = _cart.Properties?.Attributes?["sitAnimation"].AsString(null);
+            return string.IsNullOrEmpty(code) ? null
+                : new AnimationMetaData { Animation = code, Code = code, AnimationSpeed = 1f, BlendMode = EnumAnimationBlendMode.Average }.Init();
+        }
         public Matrixf            RenderTransform         => _identity;
         public EntityControls     Controls               => _controls;  // must be non-null: engine calls Controls.FromInt() during TryMount, before Passenger is assigned
 

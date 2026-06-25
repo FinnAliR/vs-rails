@@ -8,13 +8,14 @@
     { "code": "type", "states": ["cart-minecart"] }
   ],
   "maxstacksize": 1,
-  "shape": { "base": "vsrails:entity/minecart-cart" },
+  "shape": { "base": "vsrails:entity/cart-minecart" },
   "textures": {
+    "metal":       { "base": "game:block/metal/tarnished/rusty-iron" },
     "quartzglass": { "base": "game:block/glass/quartzglass" },
-    "rustyglow":   { "base": "game:block/machine/statictranslocator/rustyglow" },
-    "rusty-iron":  { "base": "game:block/metal/tarnished/rusty-iron" },
     "steel":       { "base": "game:block/metal/tarnished/steel" },
-    "charred":     { "base": "game:block/wood/charred" }
+    "charredwood": { "base": "game:block/wood/charred" },
+    "texture1":    { "base": "game:block/metal/tarnished/rusty-iron" },
+    "texture2":    { "base": "game:block/metal/tarnished/steel" }
   },
   "guiTransform": {
     "translation": { x: 1, y: 4, z: 0 },

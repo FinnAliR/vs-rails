@@ -5,12 +5,12 @@
     "attachments": []
   },
   "textures": {
-    "metal": "block/metal/corroded/rusty1",
-    "quartzglass": "block/glass/quartz",
-    "steel": "block/metal/armor-generic/steel",
-    "charredwood": "block/wood/charred",
-    "texture1": "item/bag/miningbag/linen",
-    "texture2": "item/bag/miningbag/top"
+    "metal": "game:block/metal/tarnished/rusty-iron",
+    "quartzglass": "game:block/glass/quartzglass",
+    "steel": "game:block/metal/tarnished/steel",
+    "charredwood": "game:block/wood/charred",
+    "texture1": "game:block/metal/tarnished/rusty-iron",
+    "texture2": "game:block/metal/tarnished/steel"
   },
   "elements": [
     {
@@ -3115,6 +3115,7 @@
       "quantityframes": 30,
       "name": "moving",
       "code": "anim1",
+      "onAnimationEnd": "Repeat",
       "keyframes": [
         {
           "frame": 0,
@@ -3163,6 +3164,7 @@
       "quantityframes": 12,
       "name": "punch",
       "code": "anim2",
+      "onAnimationEnd": "Stop",
       "keyframes": [
         {
           "frame": 0,
@@ -3241,6 +3243,7 @@
       "quantityframes": 18,
       "name": "corner turn 1",
       "code": "anim3",
+      "onAnimationEnd": "Stop",
       "keyframes": [
         {
           "frame": 0,
@@ -3384,6 +3387,7 @@
       "quantityframes": 18,
       "name": "corner turn 2",
       "code": "anim4",
+      "onAnimationEnd": "Stop",
       "keyframes": [
         {
           "frame": 0,

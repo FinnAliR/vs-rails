@@ -1,28 +1,36 @@
 ﻿{
   "code": "cart-minecart",
-  "class": "MineCart",
+  "class": "JonasCart",
   "tags": ["mechanical", "habitat-land", "damageable"],
   "weight": 130,
   "hitboxSize": { "x": 1.0, "y": 1.0 },
   "deadHitboxSize": { "x": 1.0, "y": 0.5 },
   "attributes": {
-    "isMechanical": true
+    "isMechanical": true,
+    "sitAnimation": "sitidle"
   },
   "drops": [],
 
   "client": {
     "renderer": "Shape",
-    "shape": { "base": "vsrails:entity/Minecart" },
+    "shape": { "base": "vsrails:entity/cart-minecart" },
     "size": 1.1,
     "textures": {
+      "metal":       { "base": "game:block/metal/tarnished/rusty-iron" },
       "quartzglass": { "base": "game:block/glass/quartzglass" },
-      "rustyglow":   { "base": "game:block/machine/statictranslocator/rustyglow" },
-      "rusty-iron":  { "base": "game:block/metal/tarnished/rusty-iron" },
       "steel":       { "base": "game:block/metal/tarnished/steel" },
-      "charred":     { "base": "game:block/wood/charred" }
+      "charredwood": { "base": "game:block/wood/charred" },
+      "texture1":    { "base": "game:block/metal/tarnished/rusty-iron" },
+      "texture2":    { "base": "game:block/metal/tarnished/steel" }
     },
     "behaviors": [
       { "code": "interpolateposition" }
+    ],
+    "animations": [
+      { "code": "moving",      "animation": "anim1", "animationSpeed": 1.0, "blendMode": "Average" },
+      { "code": "punch",       "animation": "anim2", "animationSpeed": 1.0, "blendMode": "AddAverage", "weight": 5 },
+      { "code": "cornerright", "animation": "anim3", "animationSpeed": 1.0, "blendMode": "Average" },
+      { "code": "cornerleft",  "animation": "anim4", "animationSpeed": 1.0, "blendMode": "Average" }
     ]
   },
 

@@ -8,5 +8,7 @@
     "block-rails-raised_ns": "Sloped Rail",
     "block-rails-raised_we": "Sloped Rail",
     "entity-cart-minecart": "Minecart",
-    "item-cartspawner-cart-minecart": "Minecart"
+    "item-cartspawner-cart-minecart": "Minecart",
+    "introduction-title": "VS Rails: How to use this mod:",
+    "introduction-text": "<strong>Rails</strong> <br>Minecarts move by rolling along <a href=\\\"handbook://rails-flat-ns\\\">rails</a>, they are placed based on the direction the player is facing, if you cannot get the desired orientation right clicking with a wrench will cycle through all rail variants until the desired one is found. <br><strong>MineCart</strong> <br>A <a href=\\\"handbook://cartspawner-cart-minecart\\\">minecart</a> can be placed upon rails and drived by moving forward in the desired direction, an option to automatically move the cart is enabled by default with the hotkey 'R', minecarts can be picked up with a wrench by sneaking. <br><br> A mod by: FinnAliR"
 }

@@ -3,11 +3,11 @@
   "ingredients": {
     "R": {
       "type": "item",
-      "code": "game:metalrod-*"
+      "code": "game:rod-*"
     },
     "N": {
       "type": "item",
-      "code": "game:nailsandstrips-*"
+      "code": "game:metalnailsandstrips-*"
     },
     "B": {
       "type": "item",
